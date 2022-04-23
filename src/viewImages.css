@@ -1,0 +1,25 @@
+.center-warning {
+    text-align: center;
+    padding: 40px;
+    font-size: 150%;
+}
+
+.center {
+    text-align: center;
+    padding: 10px;
+    justify-content: center
+}
+
+.padding {
+    padding: 30px;
+}
+
+.MuiPagination-ul {
+    margin: auto;
+    justify-content: center
+}
+
+.center-pagination {
+    margin: auto;
+    justify-content: center
+}
