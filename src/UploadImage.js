@@ -2,8 +2,7 @@ import {WebBundlr} from "@bundlr-network/client";
 import {useEffect, useState} from "react";
 import {toast} from 'react-toastify';
 import {ethers} from "ethers";
-import contractAddress from "./contracts/contract-address.json";
-import MemeNFTArtifact from "./contracts/MemeNFT.json";
+import deploy from "./contracts/deploy.json";
 import "./uploadImage.css"
 import {Button} from "@mui/material";
 import {AttachMoney, FileUpload} from "@mui/icons-material";
@@ -25,8 +24,8 @@ export default function UploadImage() {
     const initializeEthers = () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const memeNFTContract = new ethers.Contract(
-            contractAddress.MemeNFT,
-            MemeNFTArtifact.abi,
+            deploy.contracts.MemeNFTOpen.address,
+            deploy.contracts.MemeNFTOpen.abi,
             provider.getSigner(0)
         );
         setMemeNFT(memeNFTContract)
@@ -45,7 +44,7 @@ export default function UploadImage() {
     }
 
     const initialiseBundlr = async (provider) => {
-        const bundlr = new WebBundlr("https://node1.bundlr.network", "boba-eth", provider);
+        const bundlr = new WebBundlr("https://devnet.bundlr.network", "matic", provider, {providerUrl: "https://matic-mumbai.chainstacklabs.com"});
         await bundlr.ready();
         setBundlr(bundlr);
         return bundlr;
@@ -112,6 +111,7 @@ export default function UploadImage() {
         }
         await transaction.sign();
         const result = await transaction.upload();
+        console.log("Uploaded image to bundlr: " + result.data.id)
         const mintPromise = memeNFT.mint(result.data.id)
             .then(tx => tx.wait())
         toast.promise(mintPromise, {
@@ -152,10 +152,9 @@ export default function UploadImage() {
         }
     })
 
-
     if (window.ethereum === undefined) {
         return <div className={"center-warning"}>Install ethereum wallet</div>;
-    } else if (network !== "0x120") {
+    } else if (network !== "0x13881") {
         return <div className={"center-warning"}>Change network to Boba</div>
     } else if (balance !== undefined && bundlr && !uploaded && memeNFT) {
         return <div className={"center"}>

@@ -2,8 +2,7 @@ import {ApolloClient, gql, InMemoryCache} from "@apollo/client";
 import {useEffect, useState} from "react";
 import ViewImage from "./ViewImage";
 import {ethers} from "ethers";
-import contractAddress from "./contracts/contract-address.json";
-import MemeNFTArtifact from "./contracts/MemeNFT.json";
+import deploy from "./contracts/deploy.json";
 import {Pagination, PaginationItem} from "@mui/material";
 import {Link, useParams} from "react-router-dom";
 import "./viewImages.css";
@@ -33,8 +32,8 @@ export default function ViewImages() {
     const initializeEthers = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const memeNFTContract = new ethers.Contract(
-            contractAddress.MemeNFT,
-            MemeNFTArtifact.abi,
+            deploy.contracts.MemeNFTOpen.address,
+            deploy.contracts.MemeNFTOpen.abi,
             provider.getSigner(0)
         );
         setMemeNFT(memeNFTContract)
@@ -62,10 +61,7 @@ export default function ViewImages() {
                 query: gql`{
                             memeEntities(first: ${itemsPerPage}, skip: ${(page - 1) * itemsPerPage}, orderBy: voteCount, orderDirection: desc) {
                               id
-                              voteCount
                               link
-                              voteUp
-                              voteDown
                              }
                             }`
             })
@@ -91,7 +87,7 @@ export default function ViewImages() {
 
     if (window.ethereum === undefined) {
         return <div className={"center-warning"}>Install ethereum wallet</div>;
-    } else if (network !== "0x120") {
+    } else if (network !== "0x13881") {
         return <div className={"center-warning"}>Change network to Boba</div>
     } else if (memes && memeNFT && totalItems) {
         return <div>
