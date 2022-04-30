@@ -1,110 +1,83 @@
-import {ApolloClient, gql, InMemoryCache} from "@apollo/client";
-import {useEffect, useState} from "react";
-import ViewImage from "./ViewImage";
-import {ethers} from "ethers";
-import deploy from "./contracts/deploy.json";
-import {Pagination, PaginationItem} from "@mui/material";
-import {Link, useParams} from "react-router-dom";
+import {useState} from "react";
+import {Button} from "@mui/material";
 import "./viewImages.css";
+import {Modal} from "react-bootstrap";
 
 export default function ViewImages() {
-    const itemsPerPage = 4;
-    const client = new ApolloClient({
-        uri: 'https://graph.mainnet.boba.network/subgraphs/name/wrybakiewicz/memeNFTBoba',
-        cache: new InMemoryCache()
-    });
+    const [connected, setConnected] = useState(false)
+    const [show, setShow] = useState(false)
+    const [registered, setRegistered] = useState(true)
+    const [email, setEmail] = useState('')
+    const [activationCode, setActivationCode] = useState('')
 
-    const [memeNFT, setMemeNFT] = useState();
-    const [memes, setMemes] = useState();
-    const [totalItems, setTotalItems] = useState();
-    const [network, setNetwork] = useState();
-
-    const params = useParams();
-
-    const getPageNumber = () => {
-        if (params["*"]) {
-            return parseInt(params["*"]);
-        } else {
-            return 1;
-        }
-    }
-
-    const initializeEthers = async () => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const memeNFTContract = new ethers.Contract(
-            deploy.contracts.MemeNFTOpen.address,
-            deploy.contracts.MemeNFTOpen.abi,
-            provider.getSigner(0)
-        );
-        setMemeNFT(memeNFTContract)
-        return memeNFTContract
-    }
-
-    const updateTotalItems = async (memeNFT) => {
-        const totalItems = await memeNFT.totalSupply();
-        setTotalItems(totalItems.toNumber());
-    }
+    const handleOpen = () => setShow(true)
+    const handleClose = () => setShow(false)
 
     const initializeWallet = async () => {
-        window.ethereum.request({method: 'eth_requestAccounts'});
-        const chainId = await window.ethereum.request({method: 'eth_chainId'});
-        setNetwork(chainId)
-        window.ethereum.on("chainChanged", ([_]) => {
-            initializeEth();
-            initializeMemes();
-        });
+        await window.ethereum.request({method: 'eth_requestAccounts'});
+        setConnected(true)
+        // setShow(true)
+        getRegistered()
     }
 
-    const query = (page) => {
-        client
-            .query({
-                query: gql`{
-                            memeEntities(first: ${itemsPerPage}, skip: ${(page - 1) * itemsPerPage}, orderBy: voteCount, orderDirection: desc) {
-                              id
-                              link
-                             }
-                            }`
-            })
-            .then(result => setMemes(result.data.memeEntities));
+    const getRegistered = () => {
+        const address = window.ethereum.selectedAddress
+        //TODO: fetch notRegistered/registered/activationCodeSent
+        console.log("SET")
+        setRegistered(false)
     }
 
-    const initializeEth = () => {
-        initializeWallet().then(_ => initializeEthers()).then(memeNFT => updateTotalItems(memeNFT))
+    const sendActivationCode = () => {
+        //TODO: verify signature
+        console.log("Sending activation code after metamask verify " + email)
     }
 
-    const initializeMemes = () => {
-        query(getPageNumber());
+    const activateAccount = () => {
+        console.log("Activating account " + activationCode)
     }
 
-    useEffect(() => {
-        if (!memeNFT && window.ethereum) {
-            initializeEth()
-        }
-        if (!memes) {
-            initializeMemes();
-        }
-    })
 
-    if (window.ethereum === undefined) {
-        return <div className={"center-warning"}>Install ethereum wallet</div>;
-    } else if (network !== "0x13881") {
-        return <div className={"center-warning"}>Change network to Boba</div>
-    } else if (memes && memeNFT && totalItems) {
-        return <div>
-            <div className={"center"}>
-                {memes.map(meme => <ViewImage meme={meme} key={meme.id} memeNFT={memeNFT}/>)}
-            </div>
-            <div>
-                <Pagination
-                    onChange={(e, page) => query(page)}
-                    page={getPageNumber()}
-                    count={Math.ceil((1.0 * totalItems) / itemsPerPage)}
-                    shape="rounded"
-                    renderItem={(item) => (
-                        <PaginationItem component={Link} to={item.page === 1 ? '' : `/${item.page}`} {...item}/>)}/>
-            </div>
-        </div>
-    } else {
-        return <div></div>
-    }
+    return <div>
+        {window.ethereum && (connected || window.ethereum.selectedAddress) ?
+            registered === true ? <div className={"center"}><Button disabled>Connected</Button></div> : null
+            :
+            <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
+        {window.ethereum && (connected || window.ethereum.selectedAddress) && !registered ?
+            <div className={"center"}><Button onClick={_ => handleOpen()}>Register</Button></div> : null}
+        {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
+
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Register</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div>
+                    <div>Input your mail to register</div>
+                    <div>
+                        <input type='text' value={email} onChange={e => setEmail(e.target.value)}/>
+                        <Button variant="secondary" onClick={sendActivationCode}>
+                            Send
+                        </Button>
+                    </div>
+                </div>
+                <div>
+                    <div>Input your activation code</div>
+                    <div>
+                        <input type='text' value={activationCode} onChange={e => setActivationCode(e.target.value)}/>
+                        <Button variant="secondary" onClick={activateAccount}>
+                            Activate
+                        </Button>
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={handleClose}>
+                    Save Changes
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    </div>
 }
