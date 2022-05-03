@@ -1,12 +1,12 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button} from "@mui/material";
 import "./viewImages.css";
 import {Modal} from "react-bootstrap";
+import axios from "axios";
 
 export default function ViewImages() {
-    const [connected, setConnected] = useState(false)
     const [show, setShow] = useState(false)
-    const [registered, setRegistered] = useState(true)
+    const [registrationStatus, setRegistrationStatus] = useState('unknown')
     const [email, setEmail] = useState('')
     const [activationCode, setActivationCode] = useState('')
 
@@ -15,35 +15,49 @@ export default function ViewImages() {
 
     const initializeWallet = async () => {
         await window.ethereum.request({method: 'eth_requestAccounts'});
-        setConnected(true)
-        // setShow(true)
         getRegistered()
     }
 
+    useEffect(() => {
+        if(window.ethereum.selectedAddress && registrationStatus === 'unknown') {
+            getRegistered()
+        }
+    })
+
     const getRegistered = () => {
         const address = window.ethereum.selectedAddress
-        //TODO: fetch notRegistered/registered/activationCodeSent
-        console.log("SET")
-        setRegistered(false)
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getregistrationstatus/${address}`
+        axios.get(url)
+            .then((response) => {
+                console.log("Registration status: " + response.data.status);
+                setRegistrationStatus(response.data.status)
+            })
     }
 
     const sendActivationCode = () => {
-        //TODO: verify signature
         console.log("Sending activation code after metamask verify " + email)
+        //TODO: verify signature
+        //TODO: call endpoint
     }
 
     const activateAccount = () => {
         console.log("Activating account " + activationCode)
+        //TODO: call endpoint
+    }
+
+    const renderRegistration = () => {
+        if(registrationStatus === 'unknown' || registrationStatus === 'activated') {
+            return <div className={"center"}><Button disabled>Connected</Button></div>
+        } else {
+            return <div className={"center"}><Button onClick={_ => handleOpen()}>Register</Button></div>
+        }
     }
 
 
     return <div>
-        {window.ethereum && (connected || window.ethereum.selectedAddress) ?
-            registered === true ? <div className={"center"}><Button disabled>Connected</Button></div> : null
+        {window.ethereum && window.ethereum.selectedAddress ? renderRegistration()
             :
             <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
-        {window.ethereum && (connected || window.ethereum.selectedAddress) && !registered ?
-            <div className={"center"}><Button onClick={_ => handleOpen()}>Register</Button></div> : null}
         {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
 
         <Modal show={show} onHide={handleClose}>
@@ -60,6 +74,7 @@ export default function ViewImages() {
                         </Button>
                     </div>
                 </div>
+                {/**TODO: hide if code sent*/}
                 <div>
                     <div>Input your activation code</div>
                     <div>
