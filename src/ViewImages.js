@@ -3,6 +3,7 @@ import {Button} from "@mui/material";
 import "./viewImages.css";
 import {Modal} from "react-bootstrap";
 import axios from "axios";
+import {recoverTypedSignature_v4 as recoverTypedSignatureV4} from 'eth-sig-util';
 
 export default function ViewImages() {
     const [show, setShow] = useState(false)
@@ -19,7 +20,7 @@ export default function ViewImages() {
     }
 
     useEffect(() => {
-        if(window.ethereum.selectedAddress && registrationStatus === 'unknown') {
+        if (window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
     })
@@ -36,7 +37,45 @@ export default function ViewImages() {
 
     const sendActivationCode = () => {
         console.log("Sending activation code after metamask verify " + email)
-        //TODO: verify signature
+        const msgParams = JSON.stringify({
+            domain: {
+                chainId: 80001,
+                name: 'Meme NFT',
+                //TODO
+                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+                version: '1',
+            },
+            message: {
+                email: email,
+            },
+            primaryType: 'Mail',
+            types: {
+                Mail: [
+                    {name: 'email', type: 'string'},
+                ]
+            },
+        });
+        const params = [window.ethereum.selectedAddress, msgParams]
+        window.ethereum.sendAsync({
+            method: 'eth_signTypedData_v4',
+            params: params,
+            from: window.ethereum.selectedAddress
+        }, (error, response) => {
+            if (error) {
+                console.log("Error " + error)
+            } else {
+                console.log("Signature success")
+                console.log(response)
+                //TODO: move it to backend
+                const recovered = recoverTypedSignatureV4({
+                    data: JSON.parse(msgParams),
+                    sig: response.result,
+                });
+                console.log(recovered)
+            }
+
+        })
+        //TODO: sign email
         //TODO: call endpoint
     }
 
@@ -46,9 +85,10 @@ export default function ViewImages() {
     }
 
     const renderRegistration = () => {
-        if(registrationStatus === 'unknown' || registrationStatus === 'activated') {
+        if (registrationStatus === 'unknown' || registrationStatus === 'activated') {
             return <div className={"center"}><Button disabled>Connected</Button></div>
         } else {
+            //TODO: notRegistered/emailSent
             return <div className={"center"}><Button onClick={_ => handleOpen()}>Register</Button></div>
         }
     }
