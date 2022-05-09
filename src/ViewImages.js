@@ -65,14 +65,29 @@ export default function ViewImages() {
                 console.log("Error " + error)
             } else {
                 console.log("Signature success " + response)
-                //TODO: call endpoint
+                const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/sendactivationcode`
+                axios.post(url, {
+                    signature: response.result,
+                    params: msgParams
+                })
+                    .then((response) => {
+                        console.log("Sent activation code: " + response);
+                    })
             }
         })
     }
 
     const activateAccount = () => {
-        console.log("Activating account " + activationCode)
-        //TODO: call endpoint
+        console.log("Activating account " + activationCode + " email: " + email)
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/activate`
+        axios.post(url, {
+            email: email,
+            activationCode: activationCode
+        })
+            .then((response) => {
+                console.log("Activated: " + response);
+                getRegistered()
+            }).catch(_ => getRegistered())
     }
 
     const renderRegistration = () => {
