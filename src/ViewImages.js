@@ -3,7 +3,6 @@ import {Button} from "@mui/material";
 import "./viewImages.css";
 import {Modal} from "react-bootstrap";
 import axios from "axios";
-import {recoverTypedSignature_v4 as recoverTypedSignatureV4} from 'eth-sig-util';
 
 export default function ViewImages() {
     const [show, setShow] = useState(false)
@@ -55,6 +54,7 @@ export default function ViewImages() {
                 ]
             },
         });
+        console.log(msgParams)
         const params = [window.ethereum.selectedAddress, msgParams]
         window.ethereum.sendAsync({
             method: 'eth_signTypedData_v4',
@@ -64,19 +64,10 @@ export default function ViewImages() {
             if (error) {
                 console.log("Error " + error)
             } else {
-                console.log("Signature success")
-                console.log(response)
-                //TODO: move it to backend
-                const recovered = recoverTypedSignatureV4({
-                    data: JSON.parse(msgParams),
-                    sig: response.result,
-                });
-                console.log(recovered)
+                console.log("Signature success " + response)
+                //TODO: call endpoint
             }
-
         })
-        //TODO: sign email
-        //TODO: call endpoint
     }
 
     const activateAccount = () => {
