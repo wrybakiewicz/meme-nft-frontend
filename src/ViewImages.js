@@ -3,6 +3,7 @@ import {Button} from "@mui/material";
 import "./viewImages.css";
 import {Modal} from "react-bootstrap";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 export default function ViewImages() {
     const [show, setShow] = useState(false)
@@ -67,13 +68,16 @@ export default function ViewImages() {
             } else {
                 console.log("Signature success " + response)
                 const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/sendactivationcode`
-                axios.post(url, {
+                const sendEmailPromise = axios.post(url, {
                     signature: response.result,
                     params: msgParams
                 })
                     .then((response) => {
                         console.log("Sent activation code: " + response);
                     })
+                toast.promise(sendEmailPromise, {
+                    success: 'Email sent 👌',
+                });
             }
         })
     }
@@ -81,7 +85,7 @@ export default function ViewImages() {
     const activateAccount = () => {
         console.log("Activating account " + activationCode + " email: " + email)
         const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/activate`
-        axios.post(url, {
+        const activatePromise = axios.post(url, {
             email: email,
             activationCode: activationCode
         })
@@ -91,10 +95,16 @@ export default function ViewImages() {
             }).catch(_ => getRegistered()).then(status => {
                 if(status !== 'activated') {
                     console.log("NOT ACTIVATED")
+                    throw Error("Not activated")
                 } else {
                     console.log("ACTIVATED")
+                    handleClose()
                 }
         })
+        toast.promise(activatePromise, {
+            success: 'Activated 👌',
+            error: 'Invalid activation code 🤯'
+        });
     }
 
     const renderRegistration = () => {
@@ -119,15 +129,15 @@ export default function ViewImages() {
             </Modal.Header>
             <Modal.Body>
                 <div>
-                    <div>Input your mail to register</div>
+                    <div>Input your mail</div>
                     <div>
                         <input type='text' value={email} onChange={e => setEmail(e.target.value)}/>
+                        {registrationStatus === 'email_sent' ? null :
                         <Button variant="secondary" onClick={sendActivationCode}>
                             Send
-                        </Button>
+                        </Button>}
                     </div>
                 </div>
-                {/**TODO: hide if code sent*/}
                 <div>
                     <div>Input your activation code</div>
                     <div>
@@ -138,14 +148,6 @@ export default function ViewImages() {
                     </div>
                 </div>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleClose}>
-                    Save Changes
-                </Button>
-            </Modal.Footer>
         </Modal>
     </div>
 }
