@@ -27,10 +27,11 @@ export default function ViewImages() {
     const getRegistered = () => {
         const address = window.ethereum.selectedAddress
         const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getregistrationstatus/${address}`
-        axios.get(url)
+        return axios.get(url)
             .then((response) => {
-                console.log("Registration status: " + response.data.status);
+                console.log("Registration status: " + response.data.status)
                 setRegistrationStatus(response.data.status)
+                return response.data.status
             })
     }
 
@@ -87,7 +88,13 @@ export default function ViewImages() {
             .then((response) => {
                 console.log("Activated: " + response);
                 getRegistered()
-            }).catch(_ => getRegistered())
+            }).catch(_ => getRegistered()).then(status => {
+                if(status !== 'activated') {
+                    console.log("NOT ACTIVATED")
+                } else {
+                    console.log("ACTIVATED")
+                }
+        })
     }
 
     const renderRegistration = () => {
