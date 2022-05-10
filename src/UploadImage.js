@@ -7,6 +7,7 @@ import "./uploadImage.css"
 import {Button} from "@mui/material";
 import {AttachMoney, FileUpload} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
+import axios from "axios";
 
 export default function UploadImage() {
     const [balance, setBalance] = useState();
@@ -122,10 +123,15 @@ export default function UploadImage() {
         mintPromise.then(_ => {
             setUploaded(true)
             setUploadInProgress(false)
+            updateMemes()
         }).catch(e => {
             setUploadInProgress(false);
             throw e;
         })
+    }
+
+    const updateMemes = () => {
+        axios.post("https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/update")
     }
 
     const onImageChange = async event => {
