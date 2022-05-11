@@ -6,8 +6,8 @@ import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
 
 export default function ViewImage({meme, memeNFT}) {
-    const [voteUpCount, setVoteUpCount] = useState(meme.voteUp);
-    const [voteDownCount, setVoteDownCount] = useState(meme.voteDown);
+    const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
+    const [voteDownCount, setVoteDownCount] = useState(meme.vote_down_count);
     const [hide, setHide] = useState(true);
     const [voteUpInProgress, setVoteUpInProgress] = useState(false);
     const [voteDownInProgress, setVoteDownInProgress] = useState(false);

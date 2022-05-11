@@ -1,15 +1,19 @@
 import {useEffect, useState} from "react";
-import {Button} from "@mui/material";
+import {Button, Pagination, PaginationItem} from "@mui/material";
 import "./viewImages.css";
 import {Modal} from "react-bootstrap";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import ViewImage from "./ViewImage";
+import {Link, useParams} from "react-router-dom";
 
 export default function ViewImages() {
     const [show, setShow] = useState(false)
     const [registrationStatus, setRegistrationStatus] = useState('unknown')
     const [email, setEmail] = useState('')
     const [activationCode, setActivationCode] = useState('')
+    const [memes, setMemes] = useState();
+    const [pages, setPages] = useState();
 
     const handleOpen = () => setShow(true)
     const handleClose = () => setShow(false)
@@ -23,7 +27,33 @@ export default function ViewImages() {
         if (window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
+        if(memes === undefined) {
+            fetchMemes(getPageNumber())
+        }
     })
+
+    const params = useParams();
+
+    const getPageNumber = () => {
+        if (params["*"]) {
+            return parseInt(params["*"]);
+        } else {
+            return 1;
+        }
+    }
+
+    const fetchMemes = (page) => {
+        const itemsPerPage = 2
+        const pageSkip = page - 1
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}`
+        return axios.get(url)
+            .then((response) => {
+                console.log(response.data.memes)
+                console.log(response.data.totalPages)
+                setMemes(response.data.memes)
+                setPages(response.data.totalPages)
+            })
+    }
 
     const getRegistered = () => {
         const address = window.ethereum.selectedAddress
@@ -122,6 +152,21 @@ export default function ViewImages() {
             :
             <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
         {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
+
+        {memes !== undefined && pages !== undefined ? <div>
+            <div className={"center"}>
+                {memes.map(meme => <ViewImage meme={meme} key={meme.id}/>)}
+            </div>
+            <div>
+                <Pagination
+                    onChange={(e, page) => fetchMemes(page)}
+                    page={getPageNumber()}
+                    count={pages}
+                    shape="rounded"
+                    renderItem={(item) => (
+                        <PaginationItem component={Link} to={item.page === 1 ? '' : `/${item.page}`} {...item}/>)}/>
+            </div>
+        </div>: null}
 
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
