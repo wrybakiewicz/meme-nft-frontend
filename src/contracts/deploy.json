@@ -1,6 +1,6 @@
 {
-  "name": "mumbai",
-  "chainId": "80001",
+  "name": "matic",
+  "chainId": "137",
   "contracts": {
     "MemeNFTOpen": {
       "address": "0x1e7a8719b99Ac4e23c42E87671fc6D2a7D96A750",

@@ -37,6 +37,7 @@ export default function UploadImage() {
         console.log("Initializing wallet")
         window.ethereum.request({method: 'eth_requestAccounts'});
         const chainId = await window.ethereum.request({method: 'eth_chainId'});
+        console.log(chainId)
         setNetwork(chainId)
         window.ethereum.on("chainChanged", ([_]) => {
             console.log("Network changed")
@@ -45,7 +46,7 @@ export default function UploadImage() {
     }
 
     const initialiseBundlr = async (provider) => {
-        const bundlr = new WebBundlr("https://devnet.bundlr.network", "matic", provider, {providerUrl: "https://matic-mumbai.chainstacklabs.com"});
+        const bundlr = new WebBundlr("https://node1.bundlr.network", "matic", provider);
         await bundlr.ready();
         setBundlr(bundlr);
         return bundlr;
@@ -160,7 +161,7 @@ export default function UploadImage() {
 
     if (window.ethereum === undefined) {
         return <div className={"center-warning"}>Install ethereum wallet</div>;
-    } else if (network !== "0x13881") {
+    } else if (network !== "0x89") {
         return <div className={"center-warning"}>Change network to Boba</div>
     } else if (balance !== undefined && bundlr && !uploaded && memeNFT) {
         return <div className={"center"}>

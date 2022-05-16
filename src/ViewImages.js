@@ -70,7 +70,7 @@ export default function ViewImages() {
         console.log("Sending activation code after metamask verify " + email)
         const msgParams = JSON.stringify({
             domain: {
-                chainId: 80001,
+                chainId: 137,
                 name: 'Meme NFT',
                 //TODO
                 verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
