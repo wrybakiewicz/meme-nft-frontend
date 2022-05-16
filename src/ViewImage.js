@@ -4,6 +4,7 @@ import "./viewImage.css";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
+import axios from "axios";
 
 export default function ViewImage({meme, memeNFT}) {
     const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
@@ -12,44 +13,101 @@ export default function ViewImage({meme, memeNFT}) {
     const [voteUpInProgress, setVoteUpInProgress] = useState(false);
     const [voteDownInProgress, setVoteDownInProgress] = useState(false);
 
+    const getMessageParams = (vote, memeId) => {
+        return JSON.stringify({
+            domain: {
+                chainId: 137,
+                name: 'Meme NFT',
+                //TODO
+                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+                version: '1',
+            },
+            message: {
+                vote: vote,
+                memeId: memeId
+            },
+            primaryType: 'Vote',
+            types: {
+                Vote: [
+                    {name: 'vote', type: 'string'},
+                    {name: 'memeId', type: 'string'},
+                ]
+            },
+        });
+    }
+
     const upVote = async () => {
         setVoteUpInProgress(true)
-        const upVote = memeNFT.voteUp(meme.id)
-            .then(tx => tx.wait())
-            .then(_ => {
-                setVoteUpCount(parseInt(voteUpCount) + 1)
-                setVoteUpInProgress(false)
-            })
-            .catch(error => {
-                console.error(error)
-                setVoteUpInProgress(false)
-                throw error;
-            })
-        toast.promise(upVote, {
-            pending: 'Up vote transaction in progress',
-            success: 'Up vote transaction succeed 👌',
-            error: 'Up vote transaction failed 🤯'
-        });
+        const msgParams = getMessageParams("UP", meme.id)
+        console.log(msgParams)
+        const params = [window.ethereum.selectedAddress, msgParams]
+        window.ethereum.sendAsync({
+            method: 'eth_signTypedData_v4',
+            params: params,
+            from: window.ethereum.selectedAddress
+        }, (error, response) => {
+            if (error) {
+                console.log("Error " + error)
+            } else {
+                console.log("Signature success UP")
+                console.log(response)
+                const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/vote`
+                const voteUpPromise = axios.post(url, {
+                    signature: response.result,
+                    params: msgParams
+                })
+                    .then((response) => {
+                        console.log("Vote up: " + response);
+                        setVoteUpInProgress(false)
+                        setVoteUpCount(parseInt(voteUpCount) + 1)
+                    }).catch(e => {
+                        console.log("ERROR")
+                        console.log(e)
+                        setVoteUpInProgress(false)
+                    })
+                toast.promise(voteUpPromise, {
+                    success: 'Voted up 👌',
+                    error: 'Vote up failed 🤯'
+                });
+            }
+        })
     }
 
     const downVote = async () => {
         setVoteDownInProgress(true)
-        const downVotePromise = memeNFT.voteDown(meme.id)
-            .then(tx => tx.wait())
-            .then(_ => {
-                setVoteDownCount(parseInt(voteDownCount) + 1)
-                setVoteDownInProgress(false)
-            })
-            .catch(error => {
-                console.error(error)
-                setVoteDownInProgress(false)
-                throw error;
-            })
-        toast.promise(downVotePromise, {
-            pending: 'Down vote transaction in progress',
-            success: 'Down vote transaction succeed 👌',
-            error: 'Down vote transaction failed 🤯'
-        });
+        const msgParams = getMessageParams("DOWN", meme.id)
+        console.log(msgParams)
+        const params = [window.ethereum.selectedAddress, msgParams]
+        window.ethereum.sendAsync({
+            method: 'eth_signTypedData_v4',
+            params: params,
+            from: window.ethereum.selectedAddress
+        }, (error, response) => {
+            if (error) {
+                console.log("Error " + error)
+            } else {
+                console.log("Signature success DOWN")
+                console.log(response)
+                const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/vote`
+                const voteDownPromise = axios.post(url, {
+                    signature: response.result,
+                    params: msgParams
+                })
+                    .then((response) => {
+                        console.log("Vote down: " + response);
+                        setVoteDownInProgress(false)
+                        setVoteDownCount(parseInt(voteDownCount) + 1)
+                    }).catch(e => {
+                        console.log("ERROR")
+                        console.log(e)
+                        setVoteDownInProgress(false)
+                    })
+                toast.promise(voteDownPromise, {
+                    success: 'Voted down 👌',
+                    error: 'Vote down failed 🤯'
+                });
+            }
+        })
     }
 
     return <div className={"padding-meme"}>
