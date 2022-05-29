@@ -37,6 +37,7 @@ export default function ViewImage({meme, memeNFT}) {
     }
 
     const upVote = async () => {
+        //TODO: should be disable when competition ended
         setVoteUpInProgress(true)
         const msgParams = getMessageParams("UP", meme.id)
         console.log(msgParams)
@@ -74,6 +75,7 @@ export default function ViewImage({meme, memeNFT}) {
     }
 
     const downVote = async () => {
+        //TODO: should be disable when competition ended
         setVoteDownInProgress(true)
         const msgParams = getMessageParams("DOWN", meme.id)
         console.log(msgParams)

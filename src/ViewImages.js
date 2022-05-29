@@ -28,7 +28,10 @@ export default function ViewImages() {
             getRegistered()
         }
         if(memes === undefined) {
-            fetchMemes(getPageNumber())
+            fetchCompetitions().then(competitions => {
+                //TODO: if in url there is competitionId - use it
+                fetchMemes(getPageNumber(), competitions[1].id)
+            })
         }
     })
 
@@ -42,16 +45,26 @@ export default function ViewImages() {
         }
     }
 
-    const fetchMemes = (page) => {
+    const fetchMemes = (page, competition) => {
         const itemsPerPage = 2
         const pageSkip = page - 1
-        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}`
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competition}`
         return axios.get(url)
             .then((response) => {
                 console.log(response.data.memes)
                 console.log(response.data.totalPages)
                 setMemes(response.data.memes)
                 setPages(response.data.totalPages)
+            })
+    }
+
+    const fetchCompetitions = () => {
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getcompetitions`
+        //TODO: dodanie zakładek
+        return axios.get(url)
+            .then((response) => {
+                console.log(response.data.competitions)
+                return response.data.competitions
             })
     }
 
@@ -159,6 +172,7 @@ export default function ViewImages() {
             </div>
             <div>
                 <Pagination
+                    //TODO: pass competition id
                     onChange={(e, page) => fetchMemes(page)}
                     page={getPageNumber()}
                     count={pages}
