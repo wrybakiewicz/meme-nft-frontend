@@ -6,12 +6,14 @@ import {AutoFixHigh, Search} from "@mui/icons-material";
 import axios from "axios";
 
 export default function Menu() {
-    //TODO: change based on url
-    const getActive = () => {
+    const getActive = (competitions) => {
         if(location.pathname === "/mint") {
-            return 1;
+            return competitions.length;
         } else {
-            return 0;
+            const competitionIdPageUrl = location.pathname.substring("/competition/".length)
+            const competitionId = competitionIdPageUrl.substring(0, competitionIdPageUrl.indexOf("/"))
+            const competitionIds = competitions.map(_ => _.id)
+            return competitionIds.indexOf(parseInt(competitionId));
         }
     }
 
@@ -21,17 +23,15 @@ export default function Menu() {
             .then((response) => {
                 const competitions = response.data.competitions
                 competitions.reverse()
-                console.log(competitions)
                 setCompetitions(competitions)
                 redirectToLatestCompetition(competitions)
+                setValue(getActive(competitions))
             })
     }
 
     const redirectToLatestCompetition = (competitions) => {
-        console.log(location.pathname)
         if(location.pathname === "/") {
             const newUrl = "/competition/" + competitions[0].id + "/1"
-            console.log(newUrl)
             navigate(newUrl)
         }
     }
@@ -39,7 +39,7 @@ export default function Menu() {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const [value, setValue] = useState(getActive());
+    const [value, setValue] = useState(0);
     const [competitions, setCompetitions] = useState()
 
     const handleChange = (event, newValue) => {

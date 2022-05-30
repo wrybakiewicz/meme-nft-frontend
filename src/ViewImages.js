@@ -23,21 +23,17 @@ export default function ViewImages() {
         getRegistered()
     }
 
+    const {competitionId, page} = useParams();
+
     useEffect(() => {
-        console.log("Use effect")
+        console.log("ViewImages: Use effect")
         if (window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
-        if(memes === undefined) {
-            fetchMemes(getPageNumber())
-        }
-    })
-
-    const {competitionId, page} = useParams();
+        fetchMemes(getPageNumber())
+    }, [competitionId])
 
     const getPageNumber = () => {
-        console.log("Params")
-        console.log(page)
         if (page) {
             return parseInt(page);
         } else {
@@ -46,13 +42,12 @@ export default function ViewImages() {
     }
 
     const fetchMemes = (page) => {
+        console.log("Fetching memes")
         const itemsPerPage = 2
         const pageSkip = page - 1
         const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competitionId}`
         return axios.get(url)
             .then((response) => {
-                console.log(response.data.memes)
-                console.log(response.data.totalPages)
                 setMemes(response.data.memes)
                 setPages(response.data.totalPages)
             })
@@ -155,7 +150,7 @@ export default function ViewImages() {
             <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
         {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
 
-        {memes !== undefined && pages !== undefined ? <div>
+        {memes !== undefined && memes.length > 0 && pages !== undefined ? <div>
             <div className={"center"}>
                 {memes.map(meme => <ViewImage meme={meme} key={meme.id}/>)}
             </div>
