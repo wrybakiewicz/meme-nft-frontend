@@ -9,7 +9,7 @@ export default function App() {
             <Menu/>
             <Routes>
                 <Route path="/mint" element={<UploadImage/>}/>
-                <Route path="*" element={<ViewImages/>}/>
+                <Route path="/competition/:competitionId/:page" element={<ViewImages/>}/>
             </Routes>
         </div>
     </BrowserRouter>

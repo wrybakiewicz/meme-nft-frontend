@@ -20,6 +20,7 @@ export default function Menu() {
         return axios.get(url)
             .then((response) => {
                 const competitions = response.data.competitions
+                competitions.reverse()
                 console.log(competitions)
                 setCompetitions(competitions)
                 redirectToLatestCompetition(competitions)
@@ -29,7 +30,7 @@ export default function Menu() {
     const redirectToLatestCompetition = (competitions) => {
         console.log(location.pathname)
         if(location.pathname === "/") {
-            const newUrl = "/competition/" + competitions[competitions.length - 1].id
+            const newUrl = "/competition/" + competitions[0].id + "/1"
             console.log(newUrl)
             navigate(newUrl)
         }
@@ -53,7 +54,7 @@ export default function Menu() {
 
     if(competitions) {
         return <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example" centered>
-            {competitions.map(competition => <Tab key={competition.id} icon={<Search />} label={competition.name} component={Link} to={"/competition/" + competition.id} />)}
+            {competitions.map(competition => <Tab key={competition.id} icon={<Search />} label={competition.name} component={Link} to={"/competition/" + competition.id + "/1"} />)}
             <Tab icon={<AutoFixHigh />} label="MINT" component={Link} to="/mint" />
         </Tabs>
     } else {

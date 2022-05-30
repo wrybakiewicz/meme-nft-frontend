@@ -12,8 +12,8 @@ export default function ViewImages() {
     const [registrationStatus, setRegistrationStatus] = useState('unknown')
     const [email, setEmail] = useState('')
     const [activationCode, setActivationCode] = useState('')
-    const [memes, setMemes] = useState();
-    const [pages, setPages] = useState();
+    const [memes, setMemes] = useState()
+    const [pages, setPages] = useState()
 
     const handleOpen = () => setShow(true)
     const handleClose = () => setShow(false)
@@ -24,47 +24,37 @@ export default function ViewImages() {
     }
 
     useEffect(() => {
+        console.log("Use effect")
         if (window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
         if(memes === undefined) {
-            fetchCompetitions().then(competitions => {
-                //TODO: if in url there is competitionId - use it
-                fetchMemes(getPageNumber(), competitions[1].id)
-            })
+            fetchMemes(getPageNumber())
         }
     })
 
-    const params = useParams();
+    const {competitionId, page} = useParams();
 
     const getPageNumber = () => {
-        if (params["*"]) {
-            return parseInt(params["*"]);
+        console.log("Params")
+        console.log(page)
+        if (page) {
+            return parseInt(page);
         } else {
             return 1;
         }
     }
 
-    const fetchMemes = (page, competition) => {
+    const fetchMemes = (page) => {
         const itemsPerPage = 2
         const pageSkip = page - 1
-        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competition}`
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competitionId}`
         return axios.get(url)
             .then((response) => {
                 console.log(response.data.memes)
                 console.log(response.data.totalPages)
                 setMemes(response.data.memes)
                 setPages(response.data.totalPages)
-            })
-    }
-
-    const fetchCompetitions = () => {
-        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getcompetitions`
-        //TODO: dodanie zakładek
-        return axios.get(url)
-            .then((response) => {
-                console.log(response.data.competitions)
-                return response.data.competitions
             })
     }
 
@@ -159,7 +149,6 @@ export default function ViewImages() {
         }
     }
 
-
     return <div>
         {window.ethereum && window.ethereum.selectedAddress ? renderRegistration()
             :
@@ -172,13 +161,12 @@ export default function ViewImages() {
             </div>
             <div>
                 <Pagination
-                    //TODO: pass competition id
                     onChange={(e, page) => fetchMemes(page)}
                     page={getPageNumber()}
                     count={pages}
                     shape="rounded"
                     renderItem={(item) => (
-                        <PaginationItem component={Link} to={item.page === 1 ? '' : `/${item.page}`} {...item}/>)}/>
+                        <PaginationItem component={Link} to={`/competition/${competitionId}/${item.page}`} {...item}/>)}/>
             </div>
         </div>: null}
 
