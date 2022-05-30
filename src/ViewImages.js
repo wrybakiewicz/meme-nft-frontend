@@ -31,7 +31,7 @@ export default function ViewImages() {
             getRegistered()
         }
         fetchMemes(getPageNumber())
-    }, [competitionId])
+    }, [competitionId, window.ethereum.selectedAddress])
 
     const getPageNumber = () => {
         if (page) {
@@ -45,7 +45,13 @@ export default function ViewImages() {
         console.log("Fetching memes")
         const itemsPerPage = 2
         const pageSkip = page - 1
-        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competitionId}`
+        let address = '';
+        console.log("ADDRESS")
+        console.log(window.ethereum.selectedAddress)
+        if(window.ethereum.selectedAddress) {
+            address = `&address=${window.ethereum.selectedAddress}`
+        }
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competitionId}${address}`
         return axios.get(url)
             .then((response) => {
                 setMemes(response.data.memes)

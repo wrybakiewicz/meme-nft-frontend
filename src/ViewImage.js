@@ -1,17 +1,24 @@
 import {toast} from "react-toastify";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import "./viewImage.css";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
 import axios from "axios";
 
-export default function ViewImage({meme, memeNFT}) {
+export default function ViewImage({meme}) {
     const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
     const [voteDownCount, setVoteDownCount] = useState(meme.vote_down_count);
+    const [votedUp, setVotedUp] = useState(meme.votedUp)
+    const [votedDown, setVotedDown] = useState(meme.votedDown)
     const [hide, setHide] = useState(true);
     const [voteUpInProgress, setVoteUpInProgress] = useState(false);
     const [voteDownInProgress, setVoteDownInProgress] = useState(false);
+
+    useEffect(() => {
+        setVotedUp(meme.votedUp)
+        setVotedDown(meme.votedDown)
+    }, [meme.votedUp, meme.votedDown])
 
     const getMessageParams = (vote, memeId) => {
         return JSON.stringify({
@@ -61,6 +68,11 @@ export default function ViewImage({meme, memeNFT}) {
                         console.log("Vote up: " + response);
                         setVoteUpInProgress(false)
                         setVoteUpCount(parseInt(voteUpCount) + 1)
+                        if(votedDown) {
+                            setVoteDownCount(parseInt(voteDownCount) - 1)
+                            setVotedDown(false)
+                            setVotedUp(true)
+                        }
                     }).catch(e => {
                         console.log("ERROR")
                         console.log(e)
@@ -99,6 +111,11 @@ export default function ViewImage({meme, memeNFT}) {
                         console.log("Vote down: " + response);
                         setVoteDownInProgress(false)
                         setVoteDownCount(parseInt(voteDownCount) + 1)
+                        if(votedUp) {
+                            setVoteUpCount(parseInt(voteUpCount) - 1)
+                            setVotedUp(false)
+                            setVotedDown(true)
+                        }
                     }).catch(e => {
                         console.log("ERROR")
                         console.log(e)
@@ -131,12 +148,14 @@ export default function ViewImage({meme, memeNFT}) {
                     onClick={upVote}
                     variant="outlined"
                     component="label"
+                    disabled={votedUp}
                     endIcon={<ArrowUpward/>}>{voteUpCount}</Button>}
                 </span>
             {voteDownInProgress ? <LoadingButton loading loadingIndicator="Voting Down..." variant="outlined">Executing Vote Transaction</LoadingButton> : <Button
                 onClick={downVote}
                 variant="outlined"
                 component="label"
+                disabled={votedDown}
                 endIcon={<ArrowDownward/>}>{voteDownCount}</Button>}
         </div>
     </div>
