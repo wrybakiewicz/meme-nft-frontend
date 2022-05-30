@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import ViewImage from "./ViewImage";
 import {Link, useParams} from "react-router-dom";
 
-export default function ViewImages() {
+export default function ViewImages({competitions}) {
     const [show, setShow] = useState(false)
     const [registrationStatus, setRegistrationStatus] = useState('unknown')
     const [email, setEmail] = useState('')
@@ -38,6 +38,13 @@ export default function ViewImages() {
             return parseInt(page);
         } else {
             return 1;
+        }
+    }
+
+    const getCompetition = () => {
+        if(competitionId) {
+            console.log(competitions)
+            return competitions.filter(competition => competition.id === parseInt(competitionId))[0]
         }
     }
 
@@ -150,15 +157,30 @@ export default function ViewImages() {
         }
     }
 
+    const formatMoment = (moment) => {
+        return moment.format('MMMM Do YYYY, h:mm:ss a')
+    }
+
+    const renderCompetition = () => {
+        const competition = getCompetition()
+        return <div>
+            <div>Name: {competition.name}</div>
+            <div>From: {formatMoment(competition.startDate)}</div>
+            <div>To: {formatMoment(competition.endDate)}</div>
+        </div>
+    }
+
     return <div>
         {window.ethereum && window.ethereum.selectedAddress ? renderRegistration()
             :
             <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
         {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
 
-        {memes !== undefined && memes.length > 0 && pages !== undefined ? <div>
+        {competitionId ? renderCompetition() : null}
+
+        {memes !== undefined && memes.length > 0 && pages !== undefined && competitionId ? <div>
             <div className={"center"}>
-                {memes.map(meme => <ViewImage meme={meme} key={meme.id}/>)}
+                {memes.map(meme => <ViewImage meme={meme} key={meme.id} competition={getCompetition()}/>)}
             </div>
             <div>
                 <Pagination

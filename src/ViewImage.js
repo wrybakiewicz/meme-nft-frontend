@@ -5,8 +5,9 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
 import axios from "axios";
+import moment from "moment";
 
-export default function ViewImage({meme}) {
+export default function ViewImage({meme, competition}) {
     const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
     const [voteDownCount, setVoteDownCount] = useState(meme.vote_down_count);
     const [votedUp, setVotedUp] = useState(meme.votedUp)
@@ -44,7 +45,6 @@ export default function ViewImage({meme}) {
     }
 
     const upVote = async () => {
-        //TODO: should be disable when competition ended
         setVoteUpInProgress(true)
         const msgParams = getMessageParams("UP", meme.id)
         console.log(msgParams)
@@ -87,7 +87,6 @@ export default function ViewImage({meme}) {
     }
 
     const downVote = async () => {
-        //TODO: should be disable when competition ended
         setVoteDownInProgress(true)
         const msgParams = getMessageParams("DOWN", meme.id)
         console.log(msgParams)
@@ -129,6 +128,10 @@ export default function ViewImage({meme}) {
         })
     }
 
+    const isCompetitionActive = () => {
+        return moment().isBefore(competition.endDate) && moment().isAfter(competition.startDate)
+    }
+
     return <div className={"padding-meme"}>
         <div className={"padding-image"}>
             <div className={"nft-id"}>
@@ -148,14 +151,14 @@ export default function ViewImage({meme}) {
                     onClick={upVote}
                     variant="outlined"
                     component="label"
-                    disabled={votedUp}
+                    disabled={votedUp || !isCompetitionActive()}
                     endIcon={<ArrowUpward/>}>{voteUpCount}</Button>}
                 </span>
             {voteDownInProgress ? <LoadingButton loading loadingIndicator="Voting Down..." variant="outlined">Executing Vote Transaction</LoadingButton> : <Button
                 onClick={downVote}
                 variant="outlined"
                 component="label"
-                disabled={votedDown}
+                disabled={votedDown || !isCompetitionActive()}
                 endIcon={<ArrowDownward/>}>{voteDownCount}</Button>}
         </div>
     </div>
