@@ -1,25 +1,43 @@
 import {toast} from "react-toastify";
 import {useEffect, useState} from "react";
 import "./viewImage.css";
+import "./viewImages.css";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
 import axios from "axios";
 import moment from "moment";
+import {useParams} from "react-router-dom";
 
-export default function ViewImage({meme, competition}) {
-    const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
-    const [voteDownCount, setVoteDownCount] = useState(meme.vote_down_count);
-    const [votedUp, setVotedUp] = useState(meme.votedUp)
-    const [votedDown, setVotedDown] = useState(meme.votedDown)
-    const [hide, setHide] = useState(true);
-    const [voteUpInProgress, setVoteUpInProgress] = useState(false);
-    const [voteDownInProgress, setVoteDownInProgress] = useState(false);
+export default function Meme({competitions}) {
+    const [hide, setHide] = useState(true)
+    const [voteUpInProgress, setVoteUpInProgress] = useState(false)
+    const [voteDownInProgress, setVoteDownInProgress] = useState(false)
+    const [meme, setMeme] = useState()
 
     useEffect(() => {
-        setVotedUp(meme.votedUp)
-        setVotedDown(meme.votedDown)
-    }, [meme.votedUp, meme.votedDown])
+        if (!meme) {
+            fetchMeme()
+        }
+    }, [])
+
+    const {id} = useParams();
+
+    const fetchMeme = () => {
+        let address = ''
+        if (isConnected()) {
+            address = `&address=${window.ethereum.selectedAddress}`
+        }
+        const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemebyid?id=${id}${address}`
+        return axios.get(url)
+            .then((response) => {
+                setMeme(response.data.meme)
+            })
+    }
+
+    const isConnected = () => {
+        return window.ethereum && window.ethereum.selectedAddress
+    }
 
     const getMessageParams = (vote, memeId) => {
         return JSON.stringify({
@@ -42,10 +60,6 @@ export default function ViewImage({meme, competition}) {
                 ]
             },
         });
-    }
-
-    const isConnected = () => {
-        return window.ethereum && window.ethereum.selectedAddress
     }
 
     const upVote = async () => {
@@ -71,12 +85,7 @@ export default function ViewImage({meme, competition}) {
                     .then((response) => {
                         console.log("Vote up: " + response);
                         setVoteUpInProgress(false)
-                        setVoteUpCount(parseInt(voteUpCount) + 1)
-                        if(votedDown) {
-                            setVoteDownCount(parseInt(voteDownCount) - 1)
-                            setVotedDown(false)
-                            setVotedUp(true)
-                        }
+                        fetchMeme()
                     }).catch(e => {
                         console.log("ERROR")
                         console.log(e)
@@ -113,12 +122,7 @@ export default function ViewImage({meme, competition}) {
                     .then((response) => {
                         console.log("Vote down: " + response);
                         setVoteDownInProgress(false)
-                        setVoteDownCount(parseInt(voteDownCount) + 1)
-                        if(votedUp) {
-                            setVoteUpCount(parseInt(voteUpCount) - 1)
-                            setVotedUp(false)
-                            setVotedDown(true)
-                        }
+                        fetchMeme()
                     }).catch(e => {
                         console.log("ERROR")
                         console.log(e)
@@ -132,38 +136,69 @@ export default function ViewImage({meme, competition}) {
         })
     }
 
+    const getCompetitionForMeme = () => {
+        const competitionId = meme.competition_id
+        return competitions.filter(_ => _.id === competitionId)[0]
+    }
+
     const isCompetitionActive = () => {
+        const competition = getCompetitionForMeme()
         return moment().isBefore(competition.endDate) && moment().isAfter(competition.startDate)
     }
 
-    return <div className={"padding-meme"}>
-        <div className={"padding-image"}>
-            <div className={"nft-id"}>
-                <a href={`https://blockexplorer.boba.network/tokens/0xbcaec9c5009851a95e21d03dfa9b718d5f08e169/instance/${parseInt(meme.id)}`}
-                   target="_blank">Meme NFT {parseInt(meme.id)}</a>
-            </div>
-            <img alt={""} src={`https://arweave.net/${meme.link}`}
-                 onLoad={() => setHide(false)}
-                 style={{maxWidth: '1000px', maxHeight: '800px'}}
-            />
+    const formatMoment = (moment) => {
+        return moment.format('MMMM Do YYYY, h:mm:ss a')
+    }
+
+    const renderCompetition = () => {
+        const competition = getCompetitionForMeme()
+        return <div>
+            <div>Name: {competition.name}</div>
+            <div>From: {formatMoment(competition.startDate)}</div>
+            <div>To: {formatMoment(competition.endDate)}</div>
         </div>
-        <div hidden={hide}>
+    }
+
+
+    if (!meme) {
+        return <div></div>
+    }
+
+
+    return <div className={"center"}>
+        {renderCompetition()}
+        <div className={"padding-meme"}>
+            <div className={"padding-image"}>
+                <div className={"nft-id"}>
+                    <a href={`https://blockexplorer.boba.network/tokens/0xbcaec9c5009851a95e21d03dfa9b718d5f08e169/instance/${parseInt(meme.id)}`}
+                       target="_blank">Meme NFT {parseInt(meme.id)}</a>
+                </div>
+                <img alt={""} src={`https://arweave.net/${meme.link}`}
+                     onLoad={() => setHide(false)}
+                     style={{maxWidth: '1000px', maxHeight: '800px'}}
+                />
+            </div>
+            <div hidden={hide}>
             <span className={"padding-right"}>
             {voteUpInProgress ?
-                <LoadingButton loading loadingIndicator="Voting Up..." variant="outlined">Executing Vote Transaction</LoadingButton> :
+                <LoadingButton loading loadingIndicator="Voting Up..." variant="outlined">Executing Vote
+                    Transaction</LoadingButton> :
                 <Button
                     onClick={upVote}
                     variant="outlined"
                     component="label"
-                    disabled={votedUp || !isCompetitionActive() || !isConnected()}
-                    endIcon={<ArrowUpward/>}>{voteUpCount}</Button>}
+                    disabled={meme.votedUp || !isCompetitionActive() || !isConnected()}
+                    endIcon={<ArrowUpward/>}>{meme.vote_up_count}</Button>}
                 </span>
-            {voteDownInProgress ? <LoadingButton loading loadingIndicator="Voting Down..." variant="outlined">Executing Vote Transaction</LoadingButton> : <Button
-                onClick={downVote}
-                variant="outlined"
-                component="label"
-                disabled={votedDown || !isCompetitionActive() || !isConnected()}
-                endIcon={<ArrowDownward/>}>{voteDownCount}</Button>}
+                {voteDownInProgress ?
+                    <LoadingButton loading loadingIndicator="Voting Down..." variant="outlined">Executing Vote
+                        Transaction</LoadingButton> : <Button
+                        onClick={downVote}
+                        variant="outlined"
+                        component="label"
+                        disabled={meme.votedDown || !isCompetitionActive() || !isConnected()}
+                        endIcon={<ArrowDownward/>}>{meme.vote_down_count}</Button>}
+            </div>
         </div>
     </div>
 }

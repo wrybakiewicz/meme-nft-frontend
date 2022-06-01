@@ -8,6 +8,8 @@ export default function Menu({competitions}) {
     const getActive = () => {
         if (location.pathname === "/mint") {
             return competitions.length;
+        } else if(location.pathname.startsWith("/meme")) {
+            return false
         } else {
             const competitionIdPageUrl = location.pathname.substring("/competition/".length)
             const competitionId = competitionIdPageUrl.substring(0, competitionIdPageUrl.indexOf("/"))

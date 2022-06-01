@@ -5,6 +5,7 @@ import Menu from "./Menu";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import moment from "moment";
+import Meme from "./Meme";
 
 export default function App() {
 
@@ -43,6 +44,7 @@ export default function App() {
                 <Routes>
                     <Route path="/mint" element={<UploadImage/>}/>
                     <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
+                    <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
                 </Routes>
             </div>
         </BrowserRouter>

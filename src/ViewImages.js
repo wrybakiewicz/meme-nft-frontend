@@ -27,11 +27,11 @@ export default function ViewImages({competitions}) {
 
     useEffect(() => {
         console.log("ViewImages: Use effect")
-        if (window.ethereum.selectedAddress && registrationStatus === 'unknown') {
+        if (window.ethereum && window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
         fetchMemes(getPageNumber())
-    }, [competitionId, window.ethereum.selectedAddress])
+    }, [competitionId])
 
     const getPageNumber = () => {
         if (page) {
@@ -54,8 +54,7 @@ export default function ViewImages({competitions}) {
         const pageSkip = page - 1
         let address = '';
         console.log("ADDRESS")
-        console.log(window.ethereum.selectedAddress)
-        if(window.ethereum.selectedAddress) {
+        if(window.ethereum && window.ethereum.selectedAddress) {
             address = `&address=${window.ethereum.selectedAddress}`
         }
         const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/getmemes?itemsPerPage=${itemsPerPage}&pagesSkip=${pageSkip}&competition=${competitionId}${address}`
@@ -172,8 +171,7 @@ export default function ViewImages({competitions}) {
 
     return <div>
         {window.ethereum && window.ethereum.selectedAddress ? renderRegistration()
-            :
-            <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div>}
+            : window.ethereum ? <div className={"center"}><Button onClick={_ => initializeWallet()}>Connect</Button></div> : <div></div>}
         {!window.ethereum ? <div className={"center"}>Install Metamask</div> : null}
 
         {competitionId ? renderCompetition() : null}
