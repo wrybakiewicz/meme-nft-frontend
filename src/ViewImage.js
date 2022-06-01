@@ -6,6 +6,7 @@ import {Button} from "@mui/material";
 import {ArrowDownward, ArrowUpward} from "@mui/icons-material";
 import axios from "axios";
 import moment from "moment";
+import CopyToClipboardButton from "./CopyToClipboardButton";
 
 export default function ViewImage({meme, competition}) {
     const [voteUpCount, setVoteUpCount] = useState(meme.vote_up_count);
@@ -139,8 +140,9 @@ export default function ViewImage({meme, competition}) {
     return <div className={"padding-meme"}>
         <div className={"padding-image"}>
             <div className={"nft-id"}>
-                <a href={`https://blockexplorer.boba.network/tokens/0xbcaec9c5009851a95e21d03dfa9b718d5f08e169/instance/${parseInt(meme.id)}`}
+                <a href={`https://polygonscan.com/token/0x1e7a8719b99ac4e23c42e87671fc6d2a7d96a750?a=${parseInt(meme.id)}`}
                    target="_blank">Meme NFT {parseInt(meme.id)}</a>
+                <CopyToClipboardButton link={`/meme/${meme.id}`}/>
             </div>
             <img alt={""} src={`https://arweave.net/${meme.link}`}
                  onLoad={() => setHide(false)}
