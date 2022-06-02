@@ -18,7 +18,12 @@ export default function Menu({competitions}) {
         }
     }
 
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [value, setValue] = useState(false);
+
     const redirectToLatestCompetition = () => {
+        console.log(location.pathname)
         if (location.pathname === "/") {
             const newUrl = "/competition/" + competitions[0].id + "/1"
             navigate(newUrl)
@@ -27,11 +32,9 @@ export default function Menu({competitions}) {
 
     useEffect(() => {
         redirectToLatestCompetition()
-    }, [])
+        setValue(getActive)
+    }, [location.pathname])
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [value, setValue] = useState(getActive());
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
