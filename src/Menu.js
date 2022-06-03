@@ -10,6 +10,8 @@ export default function Menu({competitions}) {
             return competitions.length;
         } else if(location.pathname.startsWith("/meme")) {
             return false
+        } else if(location.pathname === "/myMemes") {
+            return competitions.length + 1
         } else {
             const competitionIdPageUrl = location.pathname.substring("/competition/".length)
             const competitionId = competitionIdPageUrl.substring(0, competitionIdPageUrl.indexOf("/"))
@@ -44,5 +46,6 @@ export default function Menu({competitions}) {
         {competitions.map(competition => <Tab key={competition.id} icon={<Search/>} label={competition.name}
                                               component={Link} to={"/competition/" + competition.id + "/1"}/>)}
         <Tab icon={<AutoFixHigh/>} label="MINT" component={Link} to="/mint"/>
+        <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/>
     </Tabs>
 }

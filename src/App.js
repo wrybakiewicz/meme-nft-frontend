@@ -6,6 +6,7 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import moment from "moment";
 import Meme from "./Meme";
+import MyMemes from "./MyMemes";
 
 export default function App() {
 
@@ -45,6 +46,7 @@ export default function App() {
                     <Route path="/mint" element={<UploadImage/>}/>
                     <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
                     <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
+                    <Route path="/myMemes" element={<MyMemes />}/>
                 </Routes>
             </div>
         </BrowserRouter>
