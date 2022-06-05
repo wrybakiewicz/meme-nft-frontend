@@ -20,12 +20,12 @@ export default function Menu({competitions}) {
         }
     }
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [value, setValue] = useState(false);
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [value, setValue] = useState(false)
+    const [rerender, setRerender] = useState(0)
 
     const redirectToLatestCompetition = () => {
-        console.log(location.pathname)
         if (location.pathname === "/") {
             const newUrl = "/competition/" + competitions[0].id + "/1"
             navigate(newUrl)
@@ -35,8 +35,16 @@ export default function Menu({competitions}) {
     useEffect(() => {
         redirectToLatestCompetition()
         setValue(getActive)
-    }, [location.pathname])
+        const interval = setInterval(() => setRerender(rerender + 1), 1000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [location.pathname, rerender])
 
+
+    const isConnected = () => {
+        return window.ethereum && window.ethereum.selectedAddress
+    }
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -46,6 +54,6 @@ export default function Menu({competitions}) {
         {competitions.map(competition => <Tab key={competition.id} icon={<Search/>} label={competition.name}
                                               component={Link} to={"/competition/" + competition.id + "/1"}/>)}
         <Tab icon={<AutoFixHigh/>} label="MINT" component={Link} to="/mint"/>
-        <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/>
+        {isConnected() ? <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/> : null}
     </Tabs>
 }
