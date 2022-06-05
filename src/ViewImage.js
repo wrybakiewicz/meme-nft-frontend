@@ -73,10 +73,10 @@ export default function ViewImage({meme, competition}) {
                         console.log("Vote up: " + response);
                         setVoteUpInProgress(false)
                         setVoteUpCount(parseInt(voteUpCount) + 1)
+                        setVotedUp(true)
                         if(votedDown) {
                             setVoteDownCount(parseInt(voteDownCount) - 1)
                             setVotedDown(false)
-                            setVotedUp(true)
                         }
                     }).catch(e => {
                         console.log("ERROR")
@@ -115,10 +115,10 @@ export default function ViewImage({meme, competition}) {
                         console.log("Vote down: " + response);
                         setVoteDownInProgress(false)
                         setVoteDownCount(parseInt(voteDownCount) + 1)
+                        setVotedDown(true)
                         if(votedUp) {
                             setVoteUpCount(parseInt(voteUpCount) - 1)
                             setVotedUp(false)
-                            setVotedDown(true)
                         }
                     }).catch(e => {
                         console.log("ERROR")
