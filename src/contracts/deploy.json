@@ -3,7 +3,7 @@
   "chainId": "137",
   "contracts": {
     "MemeNFTOpen": {
-      "address": "0x37016d5175817F4a17A0eE27Fd6B448AEE4c55A9",
+      "address": "0x06EF889c74c10ecd7B25C12aD3F8afB8F83Dd295",
       "abi": [
         {
           "inputs": [],
@@ -58,6 +58,25 @@
             }
           ],
           "name": "ApprovalForAll",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
           "type": "event"
         },
         {
@@ -171,6 +190,11 @@
               "internalType": "string",
               "name": "_tokenURI",
               "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "_receiver",
+              "type": "address"
             }
           ],
           "name": "mint",
@@ -198,6 +222,19 @@
           "type": "function"
         },
         {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "uint256",
@@ -214,6 +251,13 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -281,6 +325,24 @@
             }
           ],
           "name": "setApprovalForAll",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "_tokenURI",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "setTokenURI",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -414,11 +476,24 @@
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
         }
       ]
     },
     "MemeNFTWinner": {
-      "address": "0x8F0fEF8bD5943459986842D3F5d477Dd5Aa514EF",
+      "address": "0x261B448757bc2aF9161740591Aa3Bb0139fF2241",
       "abi": [
         {
           "inputs": [

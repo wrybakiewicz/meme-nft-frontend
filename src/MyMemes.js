@@ -1,9 +1,29 @@
 import {useEffect, useState} from "react";
 import MyMeme from "./MyMeme";
 import axios from "axios";
+import {ethers} from "ethers";
+import deploy from "./contracts/deploy.json";
 
 export default function MyMemes() {
     const [memes, setMemes] = useState()
+    const [memeNftWinner, setMemeNftWinner] = useState()
+    const [memeNft, setMemeNft] = useState()
+
+    const initializeEthers = () => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const memeNFTWinnerContract = new ethers.Contract(
+            deploy.contracts.MemeNFTWinner.address,
+            deploy.contracts.MemeNFTWinner.abi,
+            provider.getSigner(0)
+        );
+        setMemeNftWinner(memeNFTWinnerContract)
+        const memeNFTContract = new ethers.Contract(
+            deploy.contracts.MemeNFTOpen.address,
+            deploy.contracts.MemeNFTOpen.abi,
+            provider.getSigner(0)
+        );
+        setMemeNft(memeNFTContract)
+    }
 
     const isConnected = () => {
         return window.ethereum && window.ethereum.selectedAddress
@@ -29,17 +49,18 @@ export default function MyMemes() {
     useEffect(() => {
         if (isConnected()) {
             fetchMemes()
+            initializeEthers()
         }
     }, [])
 
-    if (!isConnected() || !memes) {
+    if (!isConnected() || !memes || !memeNftWinner) {
         return <div>Connect your wallet</div>
     }
 
     return <div>
         {getWinners().length > 0 ? <div>
             <div>Winners</div>
-            <div>{getWinners().map(_ => <MyMeme key={_.id} meme={_}/>)}</div>
+            <div>{getWinners().map(_ => <MyMeme key={_.id} meme={_} memeNftWinner={memeNftWinner} memeNft={memeNft}/>)}</div>
         </div>: <div></div>}
         {getOpenCollectionMemes().length > 0 ? <div>
             <div>Open collection</div>
