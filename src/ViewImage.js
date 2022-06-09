@@ -144,7 +144,7 @@ export default function ViewImage({meme, competition}) {
                    target="_blank">Meme NFT {parseInt(meme.id)}</a>
                 <CopyToClipboardButton link={`/meme/${meme.id}`}/>
             </div>
-            <img alt={""} src={`https://arweave.net/${meme.link}`}
+            <img alt={""} src={meme.link}
                  onLoad={() => setHide(false)}
                  style={{maxWidth: '1000px', maxHeight: '800px'}}
             />

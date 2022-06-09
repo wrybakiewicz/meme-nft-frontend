@@ -39,7 +39,7 @@ export default function MyMeme({meme, memeNftWinner, memeNft}) {
                    target="_blank">Meme NFT {parseInt(meme.id)}</a>
                 <CopyToClipboardButton link={`/meme/${meme.id}`}/>
             </div>
-            <img alt={""} src={`https://arweave.net/${meme.link}`}
+            <img alt={""} src={meme.link}
                  style={{maxWidth: '1000px', maxHeight: '800px'}}
             />
         </div>

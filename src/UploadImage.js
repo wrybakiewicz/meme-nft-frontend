@@ -1,37 +1,15 @@
-import {WebBundlr} from "@bundlr-network/client";
 import {useEffect, useState} from "react";
-import {toast} from 'react-toastify';
-import {ethers} from "ethers";
-import deploy from "./contracts/deploy.json";
 import "./uploadImage.css"
-import {Button} from "@mui/material";
-import {AttachMoney, FileUpload} from "@mui/icons-material";
-import LoadingButton from '@mui/lab/LoadingButton';
 import axios from "axios";
+import {toast} from "react-toastify";
+import {FileUpload} from "@mui/icons-material";
+import {Button} from "@mui/material";
 
 export default function UploadImage() {
-    const [balance, setBalance] = useState();
     const [image, setImage] = useState();
-    const [imageData, setImageData] = useState();
-    const [cost, setCost] = useState();
-    const [uploaded, setUploaded] = useState(false);
-    const [memeNFT, setMemeNFT] = useState();
-    const [bundlr, setBundlr] = useState();
-    const [tx, setTx] = useState();
     const [network, setNetwork] = useState();
-    const [fundInProgress, setFundInProgress] = useState(false);
-    const [uploadInProgress, setUploadInProgress] = useState(false);
-
-    const initializeEthers = () => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const memeNFTContract = new ethers.Contract(
-            deploy.contracts.MemeNFTOpen.address,
-            deploy.contracts.MemeNFTOpen.abi,
-            provider.getSigner(0)
-        );
-        setMemeNFT(memeNFTContract)
-        return provider
-    }
+    const [file, setFile] = useState()
+    const [uploadInProgress, setUploadInProgress] = useState(false)
 
     const initializeWallet = async () => {
         console.log("Initializing wallet")
@@ -41,94 +19,8 @@ export default function UploadImage() {
         setNetwork(chainId)
         window.ethereum.on("chainChanged", ([_]) => {
             console.log("Network changed")
-            initialize()
+            initializeWallet()
         });
-    }
-
-    const initialiseBundlr = async (provider) => {
-        const bundlr = new WebBundlr("https://node1.bundlr.network", "matic", provider);
-        await bundlr.ready();
-        setBundlr(bundlr);
-        return bundlr;
-    }
-
-    const updateBalance = async (bundlr) => {
-        const execute = (n) => {
-            setTimeout(async () => {
-                const balance = await bundlr.getLoadedBalance();
-                setBalance(balance.toNumber());
-                if (n < 10) {
-                    return execute(n + 1)
-                }
-            }, 1000 * n);
-        }
-
-        execute(0)
-    }
-
-    const fund = async () => {
-        try {
-            await fundUnsafe()
-        } catch (e) {
-            setFundInProgress(false);
-            throw e;
-        }
-    }
-
-    const fundUnsafe = async () => {
-        setFundInProgress(true);
-        const tx = bundlr.createTransaction(imageData)
-        setTx(tx);
-        const size = tx.size
-        const cost = await bundlr.getPrice(size)
-        const fundStatus = await bundlr.fund(cost.multipliedBy(1.05).decimalPlaces(0))
-        console.log(fundStatus)
-        updateBalance(bundlr)
-        setFundInProgress(false);
-    }
-
-    const updateCost = async (imageData) => {
-        const tx = bundlr.createTransaction(imageData)
-        const size = tx.size
-        const cost = await bundlr.getPrice(size)
-        setCost(cost.toNumber())
-    }
-
-    const upload = async () => {
-        try {
-            await uploadUnsafe();
-        } catch (e) {
-            setUploadInProgress(false);
-            throw e;
-        }
-    }
-
-    const uploadUnsafe = async () => {
-        setUploadInProgress(true)
-        let transaction;
-        if (transaction) {
-            transaction = tx;
-        } else {
-            transaction = bundlr.createTransaction(imageData);
-        }
-        await transaction.sign();
-        const result = await transaction.upload();
-        console.log("Uploaded image to bundlr: " + result.data.id)
-        const mintPromise = memeNFT.mint(result.data.id)
-            .then(tx => tx.wait())
-        toast.promise(mintPromise, {
-            pending: 'Mint transaction in progress',
-            success: 'Mint transaction succeed 👌',
-            error: 'Mint transaction failed 🤯'
-        });
-        mintPromise.then(_ => {
-            setUploaded(true)
-            setUploadInProgress(false)
-            updateMemes()
-        }).catch(e => {
-            setUploadInProgress(false);
-            throw e;
-        })
     }
 
     const updateMemes = () => {
@@ -141,78 +33,66 @@ export default function UploadImage() {
             setImage(URL.createObjectURL(img));
             const buffer = await img.arrayBuffer();
             const byteArray = new Int8Array(buffer);
-            setImageData(byteArray);
-            await updateCost(byteArray);
+            setFile(byteArray)
         }
     };
 
-    const initialize = () => {
-        initializeWallet().then(_ => {
-            const provider = initializeEthers();
-            initialiseBundlr(provider).then(bundlr => updateBalance(bundlr));
-        })
-    }
-
     useEffect(() => {
         if (!network) {
-            initialize()
+            initializeWallet()
         }
     })
+
+    const uploadMeme = async (event) => {
+        event.preventDefault()
+        setUploadInProgress(true)
+        const formData = new FormData()
+        formData.append("data", file)
+        const config = {headers: {'content-type': 'multipart/form-data'}}
+        updateMemes()
+        const uploadPromise =
+            axios.post(`https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/mint?address=${window.ethereum.selectedAddress}`, formData, config)
+                .finally(() => {
+                    document.getElementById("meme-form").reset()
+                    setImage(null)
+                    setUploadInProgress(false)
+                })
+        toast.promise(uploadPromise, {
+            pending: 'Minting your meme',
+            success: 'Your meme was minted 👌',
+            error: 'Fail minting meme 🤯'
+        });
+    }
 
     if (window.ethereum === undefined) {
         return <div className={"center-warning"}>Install ethereum wallet</div>;
     } else if (network !== "0x89") {
-        return <div className={"center-warning"}>Change network to Boba</div>
-    } else if (balance !== undefined && bundlr && !uploaded && memeNFT) {
+        return <div className={"center-warning"}>Change network to Polygon</div>
+    } else {
         return <div className={"center"}>
-            {image ? <div></div> : <div>
+            <div>
                 <div className={"middle-font"}>
                     Upload image to mint NFT
                 </div>
                 <div className={"center"}>
-                    <Button
-                        variant="contained"
-                        component="label"
-                        endIcon={<FileUpload />}>
-                        Upload
-                        <input type="file" id="image" name="img" accept="image/*" onChange={onImageChange} hidden/>
-                    </Button>
-                </div>
-            </div>}
-            {cost > balance && image ? <div>
-                <div className={"middle-font"}>You need to fund your Bundlr account to mint an NFT</div>
-                <div className={"padding"}>
-                    {fundInProgress ? <LoadingButton loading loadingIndicator="Funding..." variant="outlined">Funding account</LoadingButton> : <Button
-                        onClick={fund}
-                        variant="contained"
-                        component="label"
-                        endIcon={<AttachMoney />}>
-                        Fund my account
-                    </Button>}
-                </div>
-            </div> : <div></div>}
-            {balance > cost && image ? <div>
-                <div className={"middle-font"}>Upload image to Bundlr to mint an NFT</div>
-                <div className={"padding"}>
-                    {uploadInProgress ? <LoadingButton loading loadingIndicator="Minting..." variant="outlined">Minting NFT</LoadingButton> :
+                    <form id="meme-form" onSubmit={uploadMeme}>
+                        <input type="file" id="image" name="img" accept="image/*" onChange={onImageChange}/>
                         <Button
-                            onClick={upload}
+                            type="submit"
+                            disabled={uploadInProgress}
+                            onClick={uploadMeme}
                             variant="contained"
                             component="label"
-                            endIcon={<FileUpload />}>
-                            Mint meme as NFT
-                        </Button>}
+                            endIcon={<FileUpload/>}>
+                            Upload
+                        </Button>
+                    </form>
                 </div>
-            </div> : <div></div>}
-            {image ?
-                <div>
-                    <div className={"middle-font padding-bottom"}>Image to mint NFT from</div>
-                    <img className={"image"} alt={""} src={image}/>
-                </div> : <div></div>}
+            </div>
+            {image ? <div>
+                <div className={"middle-font padding-bottom"}>Image to mint NFT from</div>
+                <img className={"image"} alt={"meme"} src={image}/>
+            </div> : null}
         </div>
-    } else if (uploaded) {
-        return <div className={"center-warning"}>Your NFT was minted ! You can view it now</div>
-    } else {
-        return <div className={"center-warning"}>Sign message to mint meme NFT</div>
     }
 }

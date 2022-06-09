@@ -3,7 +3,7 @@
   "chainId": "137",
   "contracts": {
     "MemeNFTOpen": {
-      "address": "0x06EF889c74c10ecd7B25C12aD3F8afB8F83Dd295",
+      "address": "0x89D10D5Fe01B544A8bcaBF5F9124E1DD2788240B",
       "abi": [
         {
           "inputs": [],
@@ -186,11 +186,6 @@
         },
         {
           "inputs": [
-            {
-              "internalType": "string",
-              "name": "_tokenURI",
-              "type": "string"
-            },
             {
               "internalType": "address",
               "name": "_receiver",
@@ -493,7 +488,7 @@
       ]
     },
     "MemeNFTWinner": {
-      "address": "0x261B448757bc2aF9161740591Aa3Bb0139fF2241",
+      "address": "0x60b5308E2dce5b998615c601E9815450EE0362e2",
       "abi": [
         {
           "inputs": [
