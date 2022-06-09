@@ -9,6 +9,7 @@ import axios from "axios";
 import moment from "moment";
 import {useParams} from "react-router-dom";
 import CopyToClipboardButton from "./CopyToClipboardButton";
+import {getLink} from "./GetLinkService";
 
 export default function Meme({competitions}) {
     const [hide, setHide] = useState(true)
@@ -171,7 +172,7 @@ export default function Meme({competitions}) {
         <div className={"padding-meme"}>
             <div className={"padding-image"}>
                 <div className={"nft-id"}>
-                    <a href={`https://polygonscan.com/token/0x1e7a8719b99ac4e23c42e87671fc6d2a7d96a750?a=${parseInt(meme.id)}`}
+                    <a href={getLink(meme)}
                        target="_blank">Meme NFT {parseInt(meme.id)}</a>
                     <CopyToClipboardButton link={`/meme/${meme.id}`}/>
                 </div>

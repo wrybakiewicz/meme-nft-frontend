@@ -6,6 +6,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import {toast} from "react-toastify";
 import {useState} from "react";
 import deploy from "./contracts/deploy.json";
+import {getLink} from "./GetLinkService"
 
 export default function MyMeme({meme, memeNftWinner, memeNft}) {
 
@@ -35,7 +36,7 @@ export default function MyMeme({meme, memeNftWinner, memeNft}) {
     return <div className={"padding-meme center"}>
         <div className={"padding-image"}>
             <div className={"nft-id"}>
-                <a href={`https://polygonscan.com/token/0x1e7a8719b99ac4e23c42e87671fc6d2a7d96a750?a=${parseInt(meme.id)}`}
+                <a href={getLink(meme)}
                    target="_blank">Meme NFT {parseInt(meme.id)}</a>
                 <CopyToClipboardButton link={`/meme/${meme.id}`}/>
             </div>
@@ -59,7 +60,7 @@ export default function MyMeme({meme, memeNftWinner, memeNft}) {
                 endIcon={<ArrowDownward/>}>{meme.vote_down_count}</Button>
             </span>
             <span className={"padding-right"}>
-                {memeNftWinner ? mintInProgress ? <LoadingButton loading loadingIndicator="Minting..." variant="outlined">Minting Winner</LoadingButton> :
+                {memeNftWinner && !meme.winner_id ? mintInProgress ? <LoadingButton loading loadingIndicator="Minting..." variant="outlined">Minting Winner</LoadingButton> :
                     <Button
                         onClick={mintWinner}
                         variant="outlined"
