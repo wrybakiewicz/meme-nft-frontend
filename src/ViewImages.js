@@ -166,6 +166,7 @@ export default function ViewImages({competitions}) {
             <div>Name: {competition.name}</div>
             <div>From: {formatMoment(competition.startDate)}</div>
             <div>To: {formatMoment(competition.endDate)}</div>
+            <div>Winners number: 5</div>
         </div>
     }
 
