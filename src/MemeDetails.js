@@ -1,4 +1,4 @@
-import {getLink} from "./GetLinkService";
+import {getOpenseaLink, getScannerLink} from "./GetLinkService";
 import CopyToClipboardButton from "./CopyToClipboardButton";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Button} from "@mui/material";
@@ -9,6 +9,7 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import moment from "moment";
 import deploy from "./contracts/deploy.json";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 export default function MemeDetails({meme, competition, memeNftWinner, memeNft}) {
     const [memeState, setMemeState] = useState(meme)
@@ -184,9 +185,12 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
         <div className={"padding-meme"}>
             <div className={"padding-image"}>
                 <div className={"nft-id"}>
-                    <a href={getLink(memeState)}
+                    {memeState.is_winner ? <EmojiEventsIcon /> : null}
+                    <a href={getScannerLink(memeState)}
                        target="_blank">Meme NFT {parseInt(memeState.id)}</a>
                     <CopyToClipboardButton link={`/meme/${memeState.id}`}/>
+                    <a href={getOpenseaLink(memeState)}
+                       target="_blank">Opensea</a>
                 </div>
                 <img alt={""} src={memeState.link}
                      onLoad={() => setHide(false)}
