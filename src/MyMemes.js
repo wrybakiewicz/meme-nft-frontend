@@ -4,7 +4,7 @@ import axios from "axios";
 import {ethers} from "ethers";
 import deploy from "./contracts/deploy.json";
 
-export default function MyMemes() {
+export default function MyMemes({competitions}) {
     const [memes, setMemes] = useState()
     const [memeNftWinner, setMemeNftWinner] = useState()
     const [memeNft, setMemeNft] = useState()
@@ -60,11 +60,11 @@ export default function MyMemes() {
     return <div>
         {getWinners().length > 0 ? <div>
             <div>Winners</div>
-            <div>{getWinners().map(_ => <MyMeme key={_.id} meme={_} memeNftWinner={memeNftWinner} memeNft={memeNft}/>)}</div>
+            <div>{getWinners().map(_ => <MyMeme key={_.id} meme={_} memeNftWinner={memeNftWinner} memeNft={memeNft} competitions={competitions}/>)}</div>
         </div>: <div></div>}
         {getOpenCollectionMemes().length > 0 ? <div>
             <div>Open collection</div>
-            <div>{getOpenCollectionMemes().map(_ => <MyMeme key={_.id} meme={_}/>)}</div>
+            <div>{getOpenCollectionMemes().map(_ => <MyMeme key={_.id} meme={_} competitions={competitions}/>)}</div>
         </div>: <div></div>}
     </div>
 }

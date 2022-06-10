@@ -46,7 +46,7 @@ export default function App() {
                     <Route path="/mint" element={<UploadImage/>}/>
                     <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
                     <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
-                    <Route path="/myMemes" element={<MyMemes />}/>
+                    <Route path="/myMemes" element={<MyMemes competitions={competitions}/>}/>
                 </Routes>
             </div>
         </BrowserRouter>

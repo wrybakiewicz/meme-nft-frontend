@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import ViewImage from "./ViewImage";
 import {Link, useParams} from "react-router-dom";
+import MemeDetails from "./MemeDetails";
 
 export default function ViewImages({competitions}) {
     const [show, setShow] = useState(false)
@@ -179,7 +180,7 @@ export default function ViewImages({competitions}) {
 
         {memes !== undefined && memes.length > 0 && pages !== undefined && competitionId ? <div>
             <div className={"center"}>
-                {memes.map(meme => <ViewImage meme={meme} key={meme.id} competition={getCompetition()}/>)}
+                {memes.map(meme => <MemeDetails meme={meme} key={meme.id} competition={getCompetition()}/>)}
             </div>
             <div>
                 <Pagination
