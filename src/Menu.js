@@ -32,6 +32,7 @@ export default function Menu({competitions}) {
     const [registrationStatus, setRegistrationStatus] = useState('unknown')
     const [email, setEmail] = useState('')
     const [activationCode, setActivationCode] = useState('')
+    const [walletInitialized, setWalletInitialized] = useState(false)
 
     const handleOpen = () => setShow(true)
     const handleClose = () => setShow(false)
@@ -44,6 +45,7 @@ export default function Menu({competitions}) {
     }
 
     const initializeWallet = async () => {
+        setWalletInitialized(true)
         window.ethereum.request({method: 'eth_requestAccounts'});
         window.ethereum.on("chainChanged", ([_]) => {
             console.log("Network changed")
@@ -52,12 +54,14 @@ export default function Menu({competitions}) {
             console.log("Address changed")
             setRegistrationStatus('unknown')
         })
-        getRegistered()
     }
 
 
-    useEffect(async () => {
+    useEffect(() => {
         console.log("Use effect: Menu")
+        if(!walletInitialized) {
+            initializeWallet()
+        }
         if (window.ethereum && window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
         }
@@ -67,7 +71,7 @@ export default function Menu({competitions}) {
         return () => {
             clearInterval(interval);
         };
-    }, [location.pathname, rerender])
+    }, [location.pathname, rerender, registrationStatus])
 
 
     const isConnected = () => {
