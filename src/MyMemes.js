@@ -54,7 +54,7 @@ export default function MyMemes({competitions}) {
     }, [])
 
     if (!isConnected() || !memes || !memeNftWinner) {
-        return <div>Connect your wallet</div>
+        return null
     }
 
     return <div>

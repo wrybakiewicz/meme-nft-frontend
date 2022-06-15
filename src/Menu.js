@@ -3,7 +3,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import {useEffect, useState} from "react";
 import {AutoFixHigh, Search} from "@mui/icons-material";
-import {Button} from "@mui/material";
+import {Button, Grid} from "@mui/material";
 import axios from "axios";
 import {toast} from "react-toastify";
 import {Modal} from "react-bootstrap";
@@ -12,9 +12,9 @@ export default function Menu({competitions}) {
     const getActive = () => {
         if (location.pathname === "/mint") {
             return competitions.length;
-        } else if(location.pathname.startsWith("/meme")) {
+        } else if (location.pathname.startsWith("/meme")) {
             return false
-        } else if(location.pathname === "/myMemes") {
+        } else if (location.pathname === "/myMemes") {
             return competitions.length + 1
         } else {
             const competitionIdPageUrl = location.pathname.substring("/competition/".length)
@@ -33,6 +33,7 @@ export default function Menu({competitions}) {
     const [email, setEmail] = useState('')
     const [activationCode, setActivationCode] = useState('')
     const [walletInitialized, setWalletInitialized] = useState(false)
+    const [emailSent, setEmailSent] = useState(false)
 
     const handleOpen = () => setShow(true)
     const handleClose = () => setShow(false)
@@ -59,7 +60,7 @@ export default function Menu({competitions}) {
 
     useEffect(() => {
         console.log("Use effect: Menu")
-        if(!walletInitialized) {
+        if (!walletInitialized) {
             initializeWallet()
         }
         if (window.ethereum && window.ethereum.selectedAddress && registrationStatus === 'unknown') {
@@ -75,7 +76,7 @@ export default function Menu({competitions}) {
 
 
     const isConnected = () => {
-        return window.ethereum && window.ethereum.selectedAddress
+        return window.ethereum && window.ethereum.selectedAddress && registrationStatus === 'activated'
     }
 
     const handleChange = (event, newValue) => {
@@ -97,28 +98,18 @@ export default function Menu({competitions}) {
         console.log("Sending activation code after metamask verify " + email)
         const msgParams = JSON.stringify({
             domain: {
-                chainId: 137,
-                name: 'Meme NFT',
-                //TODO
-                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-                version: '1',
-            },
-            message: {
+                chainId: 137, name: 'Meme NFT', //TODO
+                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC', version: '1',
+            }, message: {
                 email: email,
-            },
-            primaryType: 'Mail',
-            types: {
-                Mail: [
-                    {name: 'email', type: 'string'},
-                ]
+            }, primaryType: 'Mail', types: {
+                Mail: [{name: 'email', type: 'string'},]
             },
         });
         console.log(msgParams)
         const params = [window.ethereum.selectedAddress, msgParams]
         window.ethereum.sendAsync({
-            method: 'eth_signTypedData_v4',
-            params: params,
-            from: window.ethereum.selectedAddress
+            method: 'eth_signTypedData_v4', params: params, from: window.ethereum.selectedAddress
         }, (error, response) => {
             if (error) {
                 console.log("Error " + error)
@@ -126,10 +117,10 @@ export default function Menu({competitions}) {
                 console.log("Signature success " + response)
                 const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/sendactivationcode`
                 const sendEmailPromise = axios.post(url, {
-                    signature: response.result,
-                    params: msgParams
+                    signature: response.result, params: msgParams
                 })
                     .then((response) => {
+                        setEmailSent(true)
                         console.log("Sent activation code: " + response);
                     })
                 toast.promise(sendEmailPromise, {
@@ -143,14 +134,13 @@ export default function Menu({competitions}) {
         console.log("Activating account " + activationCode + " email: " + email)
         const url = `https://ibn51vomli.execute-api.eu-central-1.amazonaws.com/prod/activate`
         const activatePromise = axios.post(url, {
-            email: email,
-            activationCode: activationCode
+            email: email, activationCode: activationCode
         })
             .then((response) => {
                 console.log("Activated: " + response);
                 getRegistered()
             }).catch(_ => getRegistered()).then(status => {
-                if(status !== 'activated') {
+                if (status !== 'activated') {
                     console.log("NOT ACTIVATED")
                     throw Error("Not activated")
                 } else {
@@ -159,58 +149,60 @@ export default function Menu({competitions}) {
                 }
             })
         toast.promise(activatePromise, {
-            success: 'Activated 👌',
-            error: 'Invalid activation code 🤯'
+            success: 'Activated 👌', error: 'Invalid activation code 🤯'
         });
     }
 
 
     const renderConnect = () => {
-        if(!window.ethereum) {
+        if (!window.ethereum) {
             return <Button disabled>Install Metamask</Button>
-        } else if(!window.ethereum.selectedAddress) {
+        } else if (!window.ethereum.selectedAddress) {
             return <Button onClick={_ => initializeWallet()}>Connect</Button>
         } else if (registrationStatus === 'unknown' || registrationStatus === 'activated') {
             return <Button disabled>Connected</Button>
         } else {
-            //TODO: notRegistered/emailSent
             return <Button onClick={_ => handleOpen()}>Register</Button>
         }
     }
 
-    return <div>
-        <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example" centered>
-            {competitions.map(competition => <Tab key={competition.id} icon={<Search/>} label={competition.name}
-                                                  component={Link} to={"/competition/" + competition.id + "/1"}/>)}
-            <Tab icon={<AutoFixHigh/>} label="MINT" component={Link} to="/mint"/>
-            {isConnected() ? <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/> : null}
+    return <Grid container>
+        <Grid item xs={11}>
+            <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example" centered>
+                {competitions.map(competition => <Tab key={competition.id} icon={<Search/>} label={competition.name}
+                                                      component={Link} to={"/competition/" + competition.id + "/1"}/>)}
+                <Tab icon={<AutoFixHigh/>} label="MINT" component={Link} to="/mint"/>
+                {isConnected() ? <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/> : null}
+            </Tabs>
+        </Grid>
+        <Grid item xs={1} style={{display: "flex"}}>
             {renderConnect()}
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Register</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+        </Grid>
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Register</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div>
+                    <div>Input your mail</div>
                     <div>
-                        <div>Input your mail</div>
-                        <div>
-                            <input type='text' value={email} onChange={e => setEmail(e.target.value)}/>
-                            {registrationStatus === 'email_sent' ? null :
-                                <Button variant="secondary" onClick={sendActivationCode}>
-                                    Send
-                                </Button>}
-                        </div>
+                        <input type='text' value={email} onChange={e => setEmail(e.target.value)}/>
+                        {registrationStatus === 'email_sent' || emailSent ? null :
+                            <Button variant="secondary" onClick={sendActivationCode}>
+                                Send
+                            </Button>}
                     </div>
+                </div>
+                {registrationStatus === 'email_sent' || emailSent ? <div>
+                    <div>Input your activation code</div>
                     <div>
-                        <div>Input your activation code</div>
-                        <div>
-                            <input type='text' value={activationCode} onChange={e => setActivationCode(e.target.value)}/>
-                            <Button variant="secondary" onClick={activateAccount}>
-                                Activate
-                            </Button>
-                        </div>
+                        <input type='text' value={activationCode} onChange={e => setActivationCode(e.target.value)}/>
+                        <Button variant="secondary" onClick={activateAccount}>
+                            Activate
+                        </Button>
                     </div>
-                </Modal.Body>
-            </Modal>
-        </Tabs>
-    </div>
+                </div> : null}
+            </Modal.Body>
+        </Modal>
+    </Grid>
 }

@@ -40,8 +40,8 @@ export default function App() {
 
     if(competitions) {
         return <BrowserRouter>
+            <Menu competitions={competitions}/>
             <div className="container p-4">
-                <Menu competitions={competitions}/>
                 <Routes>
                     <Route path="/mint" element={<UploadImage/>}/>
                     <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
