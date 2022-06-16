@@ -33,7 +33,7 @@ export default function ViewImages({competitions}) {
 
     const fetchMemes = (page) => {
         console.log("Fetching memes")
-        const itemsPerPage = 2
+        const itemsPerPage = 10
         const pageSkip = page - 1
         let address = '';
         console.log("ADDRESS")

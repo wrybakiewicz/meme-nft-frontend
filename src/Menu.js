@@ -2,11 +2,14 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import {useEffect, useState} from "react";
-import {AutoFixHigh, Search} from "@mui/icons-material";
 import {Button, Grid} from "@mui/material";
 import axios from "axios";
 import {toast} from "react-toastify";
 import {Modal} from "react-bootstrap";
+import "./Menu.css"
+import Create from '@mui/icons-material/Create';
+import AccountBalanceWallet from '@mui/icons-material/AccountBalanceWallet';
+import GridView from '@mui/icons-material/GridView';
 
 export default function Menu({competitions}) {
     const getActive = () => {
@@ -156,26 +159,26 @@ export default function Menu({competitions}) {
 
     const renderConnect = () => {
         if (!window.ethereum) {
-            return <Button disabled>Install Metamask</Button>
+            return <Button variant="contained" disabled>Install Metamask</Button>
         } else if (!window.ethereum.selectedAddress) {
-            return <Button onClick={_ => initializeWallet()}>Connect</Button>
+            return <Button variant="contained" onClick={_ => initializeWallet()}>Connect</Button>
         } else if (registrationStatus === 'unknown' || registrationStatus === 'activated') {
-            return <Button disabled>Connected</Button>
+            return <Button variant="contained" disabled>Connected</Button>
         } else {
-            return <Button onClick={_ => handleOpen()}>Register</Button>
+            return <Button variant="contained" onClick={_ => handleOpen()}>Register</Button>
         }
     }
 
     return <Grid container>
         <Grid item xs={11}>
             <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example" centered>
-                {competitions.map(competition => <Tab key={competition.id} icon={<Search/>} label={competition.name}
+                {competitions.map(competition => <Tab key={competition.id} icon={<GridView/>} label={competition.name}
                                                       component={Link} to={"/competition/" + competition.id + "/1"}/>)}
-                <Tab icon={<AutoFixHigh/>} label="MINT" component={Link} to="/mint"/>
-                {isConnected() ? <Tab icon={<AutoFixHigh/>} label="My Memes" component={Link} to="/myMemes"/> : null}
+                <Tab icon={<Create/>} label="Create" component={Link} to="/mint"/>
+                {isConnected() ? <Tab icon={<AccountBalanceWallet/>} label="My Memes" component={Link} to="/myMemes"/> : null}
             </Tabs>
         </Grid>
-        <Grid item xs={1} style={{display: "flex"}}>
+        <Grid item xs={1} className={"connect"}>
             {renderConnect()}
         </Grid>
         <Modal show={show} onHide={handleClose}>

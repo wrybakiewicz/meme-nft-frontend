@@ -79,7 +79,7 @@ export default function UploadImage() {
                         <input type="file" id="image" name="img" accept="image/*" onChange={onImageChange}/>
                         <Button
                             type="submit"
-                            disabled={uploadInProgress}
+                            disabled={uploadInProgress || !image}
                             onClick={uploadMeme}
                             variant="contained"
                             component="label"

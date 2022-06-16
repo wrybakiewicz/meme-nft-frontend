@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 import moment from "moment";
 import Meme from "./Meme";
 import MyMemes from "./MyMemes";
+import Footer from "./Footer";
 
 export default function App() {
 
@@ -49,6 +50,7 @@ export default function App() {
                     <Route path="/myMemes" element={<MyMemes competitions={competitions}/>}/>
                 </Routes>
             </div>
+            <Footer />
         </BrowserRouter>
     } return <div></div>
 }
