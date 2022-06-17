@@ -8,6 +8,7 @@ import moment from "moment";
 import Meme from "./Meme";
 import MyMemes from "./MyMemes";
 import Footer from "./Footer";
+import "./App.css"
 
 export default function App() {
 
@@ -42,7 +43,7 @@ export default function App() {
     if(competitions) {
         return <BrowserRouter>
             <Menu competitions={competitions}/>
-            <div className="container p-4">
+            <div className="container p-4 margin">
                 <Routes>
                     <Route path="/mint" element={<UploadImage/>}/>
                     <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
