@@ -72,7 +72,7 @@ export default function UploadImage() {
         return <div className={"center"}>
             <div>
                 <div className={"middle-font"}>
-                    Upload image to mint NFT
+                    Upload meme to mint NFT
                 </div>
                 <div className={"center"}>
                     <form id="meme-form" onSubmit={uploadMeme}>
