@@ -4,6 +4,7 @@ import "./viewImages.css";
 import axios from "axios";
 import {Link, useParams} from "react-router-dom";
 import MemeDetails from "./MemeDetails";
+import CompetitionDetails from "./CompetitionDetails";
 
 export default function ViewImages({competitions}) {
     const [memes, setMemes] = useState()
@@ -48,22 +49,8 @@ export default function ViewImages({competitions}) {
             })
     }
 
-    const formatMoment = (moment) => {
-        return moment.format('MMMM Do YYYY, h:mm:ss a')
-    }
-
-    const renderCompetition = () => {
-        const competition = getCompetition()
-        return <div>
-            <div>Name: {competition.name}</div>
-            <div>From: {formatMoment(competition.startDate)}</div>
-            <div>To: {formatMoment(competition.endDate)}</div>
-            <div>Winners number: 5</div>
-        </div>
-    }
-
     return <div>
-        {competitionId ? renderCompetition() : null}
+        {competitionId ? <CompetitionDetails competition={getCompetition()}/> : null}
 
         {memes !== undefined && memes.length > 0 && pages !== undefined && competitionId ? <div>
             <div className={"center"}>
