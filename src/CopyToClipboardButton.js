@@ -13,6 +13,7 @@ const CopyToClipboardButton = ({link}) => {
     return (
         <>
             <IconButton onClick={handleClick} color="primary">
+                Copy Link
                 <ShareIcon />
             </IconButton>
             <Snackbar

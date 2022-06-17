@@ -15,7 +15,7 @@ export default function Footer() {
             </Grid>
             <Grid item xs={2}>
                 <a href={"https://www.google.com/"} target="_blank"><img width="32" height="32"
-                                                                         src={'/discord.png'}/>Medium</a>
+                                                                         src={'/medium.png'}/>Medium</a>
             </Grid>
         </Grid>
     </div>

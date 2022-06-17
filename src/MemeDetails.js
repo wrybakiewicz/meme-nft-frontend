@@ -1,7 +1,7 @@
 import {getOpenseaLink, getScannerLink} from "./GetLinkService";
 import CopyToClipboardButton from "./CopyToClipboardButton";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {Button} from "@mui/material";
+import {Button, Grid} from "@mui/material";
 import {ArrowDownward, ArrowUpward, EmojiEvents} from "@mui/icons-material";
 import "./viewImage.css";
 import {useState} from "react";
@@ -184,17 +184,21 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
     return <div className={"center"}>
         <div className={"padding-meme"}>
             <div className={"padding-image"}>
-                <div className={"nft-id"}>
-                    {memeState.is_winner ? <EmojiEventsIcon /> : null}
-                    <a href={getScannerLink(memeState)}
-                       target="_blank">Meme NFT {parseInt(memeState.id)}</a>
-                    <CopyToClipboardButton link={`/meme/${memeState.id}`}/>
-                    <a href={getOpenseaLink(memeState)}
-                       target="_blank">Opensea</a>
-                </div>
+                <Grid container spacing={3}>
+                    <Grid item xs={3} />
+                    <Grid item xs={3}>
+                        {memeState.is_winner ? <EmojiEventsIcon/> : null}
+                        <a href={getScannerLink(memeState)}
+                           target="_blank">Meme NFT {parseInt(memeState.id)}</a>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <a href={getOpenseaLink(memeState)} target="_blank"><img width="24" height="24"
+                                                                                 src={'/opensea.png'}/> Opensea</a>
+                    </Grid>
+                </Grid>
                 <img alt={""} src={memeState.link}
                      onLoad={() => setHide(false)}
-                     style={{maxWidth: '1000px', maxHeight: '800px'}}
+                     style={{maxWidth: '1000px', maxHeight: '800px', padding: '5px'}}
                 />
             </div>
             <div hidden={hide}>
@@ -231,6 +235,9 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
                         disabled={false}
                         endIcon={<EmojiEvents/>}>{"Mint Winner"}</Button> : null}
             </span>
+                <div>
+                    <CopyToClipboardButton link={`/meme/${memeState.id}`}/>
+                </div>
             </div>
         </div>
     </div>
