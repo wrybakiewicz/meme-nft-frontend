@@ -40,18 +40,22 @@ export default function App() {
         fetchCompetitions()
     }, [])
 
-    if(competitions) {
-        return <BrowserRouter>
-            <Menu competitions={competitions}/>
-            <div className="container p-4 margin">
-                <Routes>
-                    <Route path="/mint" element={<UploadImage/>}/>
-                    <Route path="/competition/:competitionId/:page" element={<ViewImages competitions={competitions}/>}/>
-                    <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
-                    <Route path="/myMemes" element={<MyMemes competitions={competitions}/>}/>
-                </Routes>
-            </div>
-            <Footer />
-        </BrowserRouter>
-    } return <div></div>
+    if (competitions) {
+        return <div className={"background"}>
+            <BrowserRouter>
+                <Menu competitions={competitions}/>
+                <div className="container p-4 margin">
+                    <Routes>
+                        <Route path="/mint" element={<UploadImage/>}/>
+                        <Route path="/competition/:competitionId/:page"
+                               element={<ViewImages competitions={competitions}/>}/>
+                        <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
+                        <Route path="/myMemes" element={<MyMemes competitions={competitions}/>}/>
+                    </Routes>
+                </div>
+                <Footer/>
+            </BrowserRouter>
+        </div>
+    }
+    return <div></div>
 }
