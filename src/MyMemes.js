@@ -3,6 +3,7 @@ import MyMeme from "./MyMeme";
 import axios from "axios";
 import {ethers} from "ethers";
 import deploy from "./contracts/deploy.json";
+import "./MyMemes.css"
 
 export default function MyMemes({competitions}) {
     const [memes, setMemes] = useState()
@@ -59,11 +60,11 @@ export default function MyMemes({competitions}) {
 
     return <div>
         {getWinners().length > 0 ? <div>
-            <div>Winners</div>
+            <h1 className={"caption"}>Winners</h1>
             <div>{getWinners().map(_ => <MyMeme key={_.id} meme={_} memeNftWinner={memeNftWinner} memeNft={memeNft} competitions={competitions}/>)}</div>
         </div>: <div></div>}
         {getOpenCollectionMemes().length > 0 ? <div>
-            <div>Open collection</div>
+            <h1 className={"caption"}>Open collection</h1>
             <div>{getOpenCollectionMemes().map(_ => <MyMeme key={_.id} meme={_} competitions={competitions}/>)}</div>
         </div>: <div></div>}
     </div>
