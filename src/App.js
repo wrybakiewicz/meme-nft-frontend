@@ -13,6 +13,7 @@ import "./App.css"
 export default function App() {
 
     const [competitions, setCompetitions] = useState()
+    const [registrationStatus, setRegistrationStatus] = useState('unknown')
 
     const toMoment = (dateString) => {
         return moment(dateString, 'YYYY-MM-DDThh:mm:ss')
@@ -37,20 +38,21 @@ export default function App() {
     }
 
     useEffect(() => {
+        console.log("Use effect: APP")
         fetchCompetitions()
-    }, [])
+    }, [registrationStatus])
 
     if (competitions) {
         return <div className={"background"}>
             <BrowserRouter>
-                <Menu competitions={competitions}/>
+                <Menu competitions={competitions} setNewRegistrationStatus={(status) => setRegistrationStatus(status)}/>
                 <div className="container p-4 margin">
                     <Routes>
-                        <Route path="/mint" element={<UploadImage/>}/>
+                        <Route path="/mint" element={<UploadImage registrationStatus={registrationStatus}/>}/>
                         <Route path="/competition/:competitionId/:page"
-                               element={<ViewImages competitions={competitions}/>}/>
-                        <Route path="/meme/:id/" element={<Meme competitions={competitions}/>}/>
-                        <Route path="/myMemes" element={<MyMemes competitions={competitions}/>}/>
+                               element={<ViewImages competitions={competitions} registrationStatus={registrationStatus}/>}/>
+                        <Route path="/meme/:id/" element={<Meme competitions={competitions} registrationStatus={registrationStatus}/>}/>
+                        <Route path="/myMemes" element={<MyMemes competitions={competitions} registrationStatus={registrationStatus}/>}/>
                     </Routes>
                 </div>
                 <Footer/>

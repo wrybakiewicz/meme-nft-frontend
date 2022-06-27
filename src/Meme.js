@@ -10,9 +10,8 @@ export default function Meme({competitions}) {
     const [meme, setMeme] = useState()
 
     useEffect(() => {
-        if (!meme) {
-            fetchMeme()
-        }
+        console.log("useEffect: Meme component")
+        fetchMeme()
     }, [])
 
     const {id} = useParams();

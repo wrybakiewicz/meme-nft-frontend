@@ -11,7 +11,7 @@ import Create from '@mui/icons-material/Create';
 import AccountBalanceWallet from '@mui/icons-material/AccountBalanceWallet';
 import GridView from '@mui/icons-material/GridView';
 
-export default function Menu({competitions}) {
+export default function Menu({competitions, setNewRegistrationStatus}) {
     const getActive = () => {
         if (location.pathname === "/mint") {
             return competitions.length;
@@ -93,6 +93,7 @@ export default function Menu({competitions}) {
             .then((response) => {
                 console.log("Registration status: " + response.data.status)
                 setRegistrationStatus(response.data.status)
+                setNewRegistrationStatus(response.data.status)
                 return response.data.status
             })
     }

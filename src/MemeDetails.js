@@ -11,7 +11,7 @@ import moment from "moment";
 import deploy from "./contracts/deploy.json";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
-export default function MemeDetails({meme, competition, memeNftWinner, memeNft}) {
+export default function MemeDetails({meme, competition, memeNftWinner, memeNft, registrationStatus}) {
     const [memeState, setMemeState] = useState(meme)
     const [hide, setHide] = useState(true);
     const [voteUpInProgress, setVoteUpInProgress] = useState(false);
@@ -45,6 +45,10 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
 
     const isConnected = () => {
         return window.ethereum && window.ethereum.selectedAddress
+    }
+
+    const canVote = () => {
+        return isConnected() && registrationStatus === 'activated'
     }
 
     const getMessageParams = (vote, memeId) => {
@@ -210,7 +214,7 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
                     onClick={upVote}
                     variant="outlined"
                     component="label"
-                    disabled={votedUp || !isCompetitionActive() || !isConnected()}
+                    disabled={votedUp || !isCompetitionActive() || !canVote()}
                     endIcon={<ArrowUpward/>}>{voteUpCount}</Button>}
                 </span>
                 <span className={"padding-right"}>
@@ -221,7 +225,7 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft})
                     onClick={downVote}
                     variant="outlined"
                     component="label"
-                    disabled={votedDown || !isCompetitionActive() || !isConnected()}
+                    disabled={votedDown || !isCompetitionActive() || !canVote()}
                     endIcon={<ArrowDownward/>}>{voteDownCount}</Button>}
             </span>
                 <span className={"padding-right"}>

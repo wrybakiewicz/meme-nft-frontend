@@ -5,7 +5,7 @@ import {toast} from "react-toastify";
 import {FileUpload} from "@mui/icons-material";
 import {Button} from "@mui/material";
 
-export default function UploadImage() {
+export default function UploadImage({registrationStatus}) {
     const [image, setImage] = useState();
     const [network, setNetwork] = useState();
     const [file, setFile] = useState()
@@ -64,35 +64,29 @@ export default function UploadImage() {
         });
     }
 
-    if (window.ethereum === undefined) {
-        return <div className={"center-warning"}>Install ethereum wallet</div>;
-    } else if (network !== "0x89") {
-        return <div className={"center-warning"}>Change network to Polygon</div>
-    } else {
-        return <div className={"center"}>
-            <div>
-                <div className={"middle-font"}>
-                    Upload meme to mint NFT
-                </div>
-                <div className={"center"}>
-                    <form id="meme-form" onSubmit={uploadMeme}>
-                        <input type="file" id="image" name="img" accept="image/*" onChange={onImageChange}/>
-                        <Button
-                            type="submit"
-                            disabled={uploadInProgress || !image}
-                            onClick={uploadMeme}
-                            variant="contained"
-                            component="label"
-                            endIcon={<FileUpload/>}>
-                            Upload
-                        </Button>
-                    </form>
-                </div>
+    return <div className={"center"}>
+        <div>
+            <div className={"middle-font"}>
+                Upload meme to mint NFT
             </div>
-            {image ? <div>
-                <div className={"middle-font padding-bottom"}>Image to mint NFT from</div>
-                <img className={"image"} alt={"meme"} src={image}/>
-            </div> : null}
+            <div className={"center"}>
+                <form id="meme-form" onSubmit={uploadMeme}>
+                    <input type="file" id="image" name="img" accept="image/*" onChange={onImageChange}/>
+                    <Button
+                        type="submit"
+                        disabled={uploadInProgress || !image || registrationStatus !== 'activated'}
+                        onClick={uploadMeme}
+                        variant="contained"
+                        component="label"
+                        endIcon={<FileUpload/>}>
+                        Upload
+                    </Button>
+                </form>
+            </div>
         </div>
-    }
+        {image ? <div>
+            <div className={"middle-font padding-bottom"}>Image to mint NFT from</div>
+            <img className={"image"} alt={"meme"} src={image}/>
+        </div> : null}
+    </div>
 }

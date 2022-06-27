@@ -6,7 +6,7 @@ import {Link, useParams} from "react-router-dom";
 import MemeDetails from "./MemeDetails";
 import CompetitionDetails from "./CompetitionDetails";
 
-export default function ViewImages({competitions}) {
+export default function ViewImages({competitions, registrationStatus}) {
     const [memes, setMemes] = useState()
     const [pages, setPages] = useState()
 
@@ -15,7 +15,7 @@ export default function ViewImages({competitions}) {
     useEffect(() => {
         console.log("ViewImages: Use effect")
         fetchMemes(getPageNumber())
-    }, [competitionId])
+    }, [competitionId, registrationStatus])
 
     const getPageNumber = () => {
         if (page) {
@@ -54,7 +54,7 @@ export default function ViewImages({competitions}) {
 
         {memes !== undefined && memes.length > 0 && pages !== undefined && competitionId ? <div>
             <div className={"center"}>
-                {memes.map(meme => <MemeDetails meme={meme} key={meme.id} competition={getCompetition()}/>)}
+                {memes.map(meme => <MemeDetails meme={meme} key={meme.id} competition={getCompetition()} registrationStatus={registrationStatus}/>)}
             </div>
             <div>
                 <Pagination
