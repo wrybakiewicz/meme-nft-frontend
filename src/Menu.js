@@ -68,6 +68,9 @@ export default function Menu({competitions, setNewRegistrationStatus}) {
         }
         if (window.ethereum && window.ethereum.selectedAddress && registrationStatus === 'unknown') {
             getRegistered()
+        } else if (registrationStatus === 'unknown') {
+            setRegistrationStatus('notConnected')
+            setNewRegistrationStatus('notConnected')
         }
         redirectToLatestCompetition()
         setValue(getActive)
@@ -129,6 +132,7 @@ export default function Menu({competitions, setNewRegistrationStatus}) {
                     })
                 toast.promise(sendEmailPromise, {
                     success: 'Email sent 👌',
+                    error: 'Failed to send email 🤯'
                 });
             }
         })
@@ -188,7 +192,7 @@ export default function Menu({competitions, setNewRegistrationStatus}) {
             </Modal.Header>
             <Modal.Body>
                 <div>
-                    <div>Input your mail</div>
+                    <div>Email</div>
                     <div>
                         <input type='text' value={email} onChange={e => setEmail(e.target.value)}/>
                         {registrationStatus === 'email_sent' || emailSent ? null :
