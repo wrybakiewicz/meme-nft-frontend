@@ -2,8 +2,8 @@
   "name": "matic",
   "chainId": "137",
   "contracts": {
-    "MemeNFTOpen": {
-      "address": "0x89D10D5Fe01B544A8bcaBF5F9124E1DD2788240B",
+    "MemeDegensOpen": {
+      "address": "0xcEfF1bcCa58e64BB2348Ef4B3670921e42730EDa",
       "abi": [
         {
           "inputs": [],
@@ -487,8 +487,8 @@
         }
       ]
     },
-    "MemeNFTWinner": {
-      "address": "0x60b5308E2dce5b998615c601E9815450EE0362e2",
+    "MemeDegensWinners": {
+      "address": "0x8B5DF4E2bd39c57DFF422F26645B4176d2F0a356",
       "abi": [
         {
           "inputs": [

@@ -164,7 +164,7 @@ export default function MemeDetails({meme, competition, memeNftWinner, memeNft, 
 
     const mintWinner = async () => {
         setMintInProgress(true)
-        const memeNftWinnerAddress = deploy.contracts.MemeNFTWinner.address
+        const memeNftWinnerAddress = deploy.contracts.MemeDegensWinners.address
         const isApprovedForAll = await memeNft.isApprovedForAll(window.ethereum.selectedAddress, memeNftWinnerAddress)
         console.log(isApprovedForAll)
         let setApproveForAllTx = Promise.resolve()

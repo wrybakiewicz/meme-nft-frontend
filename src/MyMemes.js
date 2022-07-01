@@ -13,14 +13,14 @@ export default function MyMemes({competitions}) {
     const initializeEthers = () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const memeNFTWinnerContract = new ethers.Contract(
-            deploy.contracts.MemeNFTWinner.address,
-            deploy.contracts.MemeNFTWinner.abi,
+            deploy.contracts.MemeDegensWinners.address,
+            deploy.contracts.MemeDegensWinners.abi,
             provider.getSigner(0)
         );
         setMemeNftWinner(memeNFTWinnerContract)
         const memeNFTContract = new ethers.Contract(
-            deploy.contracts.MemeNFTOpen.address,
-            deploy.contracts.MemeNFTOpen.abi,
+            deploy.contracts.MemeDegensOpen.address,
+            deploy.contracts.MemeDegensOpen.abi,
             provider.getSigner(0)
         );
         setMemeNft(memeNFTContract)
