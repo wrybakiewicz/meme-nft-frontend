@@ -179,7 +179,7 @@ export default function Menu({competitions, setNewRegistrationStatus}) {
             <Tabs value={value} onChange={handleChange} aria-label="icon label tabs example" centered>
                 {competitions.map(competition => <Tab key={competition.id} icon={<GridView/>} label={competition.name}
                                                       component={Link} to={"/competition/" + competition.id + "/1"}/>)}
-                <Tab icon={<Create/>} label="Create" component={Link} to="/mint"/>
+                {isConnected() ? <Tab icon={<Create/>} label="Create" component={Link} to="/mint"/> : null}
                 {isConnected() ? <Tab icon={<AccountBalanceWallet/>} label="My Memes" component={Link} to="/myMemes"/> : null}
             </Tabs>
         </Grid>
