@@ -6,7 +6,7 @@ import {useParams} from "react-router-dom";
 import MemeDetails from "./MemeDetails";
 import CompetitionDetails from "./CompetitionDetails";
 
-export default function Meme({competitions}) {
+export default function Meme({competitions, registrationStatus}) {
     const [meme, setMeme] = useState()
 
     useEffect(() => {
@@ -45,6 +45,6 @@ export default function Meme({competitions}) {
 
     return <div className={"center"}>
         <CompetitionDetails competition={getCompetitionForMeme()} showCompetition={true}/>
-        <MemeDetails meme={meme} competition={getCompetitionForMeme()}/>
+        <MemeDetails meme={meme} competition={getCompetitionForMeme()} registrationStatus={registrationStatus}/>
     </div>
 }
